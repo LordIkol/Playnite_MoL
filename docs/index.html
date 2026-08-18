@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mythos of Loki — DetailsView Grid Representation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0d14;
+      --bg-surface: #101522;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-glass: rgba(16, 22, 36, 0.65);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(4, 165, 255, 0.35);
+      
+      --accent-primary: #04a5ff;
+      --accent-gradient: linear-gradient(135deg, #04a5ff 0%, #0066fe 100%);
+      --accent-glow: 0 0 20px rgba(4, 165, 255, 0.4);
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --badge-bg: rgba(4, 165, 255, 0.12);
+      --badge-border: rgba(4, 165, 255, 0.25);
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation / Toolbar */
+    header.toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 32px;
+      background: rgba(10, 13, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-gradient);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--accent-glow);
+    }
+
+    .brand h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      letter-spacing: 1px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .brand span {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-primary);
+      background: var(--badge-bg);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--badge-border);
+      font-weight: 600;
+    }
+
+    .controls-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .toggle-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-btn.active {
+      background: rgba(4, 165, 255, 0.15);
+      border-color: var(--accent-primary);
+      color: #fff;
+    }
+
+    .toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    /* DetailsView Container Frame */
+    .details-viewport {
+      max-width: 1400px;
+      margin: 24px auto 60px;
+      padding: 0 24px;
+    }
+
+    .theme-frame {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    /* 1. Header Banner */
+    .header-banner {
+      position: relative;
+      min-height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, rgba(10, 13, 20, 0.2) 0%, rgba(10, 13, 20, 0.85) 100%),
+                  url('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+      border-bottom: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .banner-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 60%, rgba(4, 165, 255, 0.15), transparent 70%);
+      pointer-events: none;
+    }
+
+    .game-logo-container {
+      text-align: center;
+      z-index: 2;
+      padding: 20px;
+    }
+
+    .game-title {
+      font-family: 'Cinzel', serif;
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9), 0 0 30px rgba(4, 165, 255, 0.4);
+    }
+
+    .game-subtitle {
+      font-size: 0.95rem;
+      color: var(--accent-primary);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 4px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    /* 2. Action & Status Bar (Sticky Header) */
+    .action-bar {
+      position: sticky;
+      top: 57px;
+      z-index: 50;
+      min-height: 68px;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .actions-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-play {
+      height: 40px;
+      min-width: 115px;
+      padding: 0 22px;
+      background: var(--accent-gradient);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: var(--accent-glow);
+      transition: all 0.2s ease;
+    }
+
+    .btn-play:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 28px rgba(4, 165, 255, 0.65);
+    }
+
+    .btn-context, .btn-more {
+      height: 40px;
+      padding: 0 16px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-context:hover, .btn-more:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .status-meta {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+
+    .meta-stat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .meta-stat .icon {
+      font-size: 1.1rem;
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: rgba(4, 165, 255, 0.1);
+      border-radius: var(--radius-sm);
+    }
+
+    .meta-stat .stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .meta-stat .label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+
+    .meta-stat .value {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .meta-stat .value.link {
+      color: var(--accent-primary);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .meta-stat .value.link:hover {
+      text-decoration: underline;
+    }
+
+    .completion-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .actions-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .icon-btn.active {
+      background: rgba(4, 165, 255, 0.2);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    /* 3. Main Content Section (70/30 Columns) */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 7fr 3fr;
+      gap: 32px;
+      padding: 36px 40px;
+    }
+
+    @media (max-width: 1024px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left Column */
+    .left-column {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .media-card {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      background: #000;
+      max-height: 340px;
+      aspect-ratio: 16/9;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .media-card img, .media-card video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-overlay-controls {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, transparent 60%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .media-card:hover .video-overlay-controls {
+      opacity: 1;
+    }
+
+    .big-play-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: var(--accent-glow);
+    }
+
+    .steam-links-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .link-chip {
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .link-chip:hover {
+      background: rgba(4, 165, 255, 0.1);
+      border-color: var(--accent-primary);
+      color: #fff;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 16px;
+      background: var(--accent-primary);
+      border-radius: var(--radius-full);
+    }
+
+    .game-description {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .chips-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .genre-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    /* Right Column */
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .cover-card-container {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .game-cover {
+      width: 170px;
+      height: 245px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+    }
+
+    .scores-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .metacritic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      width: fit-content;
+    }
+
+    .score-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #66cc33;
+      color: #000;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+    }
+
+    .score-meta .title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    .score-meta .val {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .meta-table {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 8px 20px;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.88rem;
+    }
+
+    .meta-row:last-child {
+      border-bottom: none;
+    }
+
+    .meta-row .meta-label {
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    .meta-row .meta-val {
+      color: var(--text-main);
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .platform-pill {
+      background: rgba(4, 165, 255, 0.12);
+      border: 1px solid var(--badge-border);
+      color: var(--accent-primary);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .plugin-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+    }
+
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .achieve-slot {
+      aspect-ratio: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #f59e0b;
+      position: relative;
+    }
+
+    .achieve-slot.unlocked::after {
+      content: '✓';
+      position: absolute;
+      bottom: 4px;
+      right: 6px;
+      font-size: 0.65rem;
+      color: #10b981;
+      font-weight: 900;
+    }
+
+    /* Inspector Tooltip Highlighting */
+    .wpf-inspected {
+      outline: 2px dashed #04a5ff !important;
+      outline-offset: 2px;
+      position: relative;
+    }
+
+    .wpf-tag-pill {
+      position: absolute;
+      top: -24px;
+      left: 0;
+      background: #04a5ff;
+      color: #000;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      z-index: 99;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* Bottom Info Drawer */
+    .info-footer {
+      max-width: 1400px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+
+    .inspector-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px 32px;
+    }
+
+    .inspector-panel h2 {
+      font-size: 1.2rem;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .spec-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+
+    .spec-card .title {
+      font-size: 0.8rem;
+      color: var(--accent-primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .spec-card .code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      display: block;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Toolbar -->
+  <header class="toolbar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <h1>Mythos of Loki</h1>
+      <span>DetailsView Spec</span>
+    </div>
+
+    <div class="controls-bar">
+      <button class="toggle-btn active" id="btnToggleVideo" onclick="toggleVideoState()">
+        <span>🎬 Video: Enabled</span>
+      </button>
+      <button class="toggle-btn" id="btnToggleInspector" onclick="toggleInspectorMode()">
+        <span>🔍 WPF Inspector Mode</span>
+      </button>
+      <a href="details_view_grid_map.md" class="toggle-btn" style="text-decoration:none;">
+        <span>📄 View Markdown Map</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Viewport Mockup -->
+  <main class="details-viewport">
+    <div class="theme-frame" id="themeFrame">
+      
+      <!-- 1. Header Banner -->
+      <section class="header-banner wpf-target" data-wpf="Row 0: Top Header Banner (PART_ImageBackground + LogoLoader)">
+        <div class="banner-glow"></div>
+        <div class="game-logo-container">
+          <div class="game-title">VALHALLA SAGA</div>
+          <div class="game-subtitle">Mythos of Loki Edition</div>
+        </div>
+      </section>
+
+      <!-- 2. Action & Status Bar -->
+      <section class="action-bar wpf-target" data-wpf="HeaderRow (MinHeight: 68px, Padding: 40,14)">
+        
+        <!-- Left Action Buttons -->
+        <div class="actions-left wpf-target" data-wpf="PART_ButtonPlayAction (Height: 40px, Accent Gradient)">
+          <button class="btn-play">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Play
+          </button>
+          <button class="btn-context" data-wpf="PART_ButtonContextAction">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Install
+          </button>
+          <button class="btn-more" data-wpf="PART_ButtonMoreActions">···</button>
+        </div>
+
+        <!-- Center Metadata Elements -->
+        <div class="status-meta">
+          
+          <!-- Last Played -->
+          <div class="meta-stat wpf-target" data-wpf="PART_ElemLastPlayed (PART_TextLastActivity)">
+            <div class="icon">🕒</div>
+            <div class="stat-info">
+              <span class="label">Last Played</span>
+              <span class="value">Yesterday, 21:40</span>
+            </div>
+          </div>
+
+          <!-- Time Played -->
+          <div class="meta-stat wpf-target" data-wpf="PART_ElemPlayTime (PART_TextPlayTime)">
+            <div class="icon">⏱</div>
+            <div class="stat-info">
+              <span class="label">Time Played</span>
+              <span class="value">24h 32m</span>
+            </div>
+          </div>
+
+          <!-- Install Size -->
+          <div class="meta-stat wpf-target" data-wpf="PART_ElemInstallSize (PART_TextInstallSize)">
+            <div class="icon">💾</div>
+            <div class="stat-info">
+              <span class="label">Install Size</span>
+              <span class="value">84.5 GB</span>
+            </div>
+          </div>
+
+          <!-- Install Folder -->
+          <div class="meta-stat wpf-target" data-wpf="PART_ElemInstallDirectory (PART_ButtonInstallDirectory)">
+            <div class="icon">📁</div>
+            <div class="stat-info">
+              <span class="label">Install Folder</span>
+              <span class="value link">C:\Games\ValhallaSaga</span>
+            </div>
+          </div>
+
+          <!-- Completion Status -->
+          <div class="meta-stat wpf-target" data-wpf="PART_ElemCompletionStatus (ThemeExtras Settable)">
+            <div class="completion-badge">
+              <span>●</span> Completed
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Quick Tools -->
+        <div class="actions-right">
+          <button class="icon-btn wpf-target" data-wpf="PART_ButtonEditGame" title="Edit Game">✏</button>
+          <button class="icon-btn active wpf-target" data-wpf="PanelToggleButton" title="Toggle Info Panel">ℹ</button>
+          <button class="icon-btn active wpf-target" data-wpf="GameFavoriteToggleButton" title="Favorite Game">★</button>
+          <button class="icon-btn wpf-target" data-wpf="PlayState_GameStateSwitchControl" title="PlayState">⚡</button>
+        </div>
+
+      </section>
+
+      <!-- 3. Main Content Section (2-Column Grid) -->
+      <section class="content-grid">
+        
+        <!-- Left Column: Video, Synopsis, Links, Screenshots -->
+        <div class="left-column">
+          
+          <!-- Media Player Card -->
+          <div class="media-card wpf-target" id="videoCard" data-wpf="MediaPreviewGrid & ExtraMetadataLoader_VideoLoaderControl (MaxHeight: 340px)">
+            <img id="videoImg" src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1000&q=80" alt="Trailer Preview">
+            <div class="video-overlay-controls">
+              <div class="big-play-btn">▶</div>
+            </div>
+          </div>
+
+          <!-- Steam Links -->
+          <div class="steam-links-bar wpf-target" data-wpf="SteamLinksBorder (Store Page, Discussions, Community Hub)">
+            <a href="#" class="link-chip">🌐 Store Page</a>
+            <a href="#" class="link-chip">💬 Community Hub</a>
+            <a href="#" class="link-chip">📖 Discussions</a>
+            <a href="#" class="link-chip">🏆 Achievements</a>
+          </div>
+
+          <!-- Description -->
+          <div class="wpf-target" data-wpf="PART_ElemDescription (Rich HTML Synopsis)">
+            <h3 class="section-title">About the Game</h3>
+            <p class="game-description">
+              Embark on an epic Viking saga across ancient icy realms and forgotten mythical sanctuaries. Forge your alliance with legendary Norse deities, conquer fierce mythological beasts, and craft your own saga amidst cinematic landscapes and dynamic combat systems.
+            </p>
+            
+            <div class="chips-group wpf-target" data-wpf="PART_ItemsGenres & PART_ItemsFeatures">
+              <span class="genre-chip">Action RPG</span>
+              <span class="genre-chip">Open World</span>
+              <span class="genre-chip">Mythology</span>
+              <span class="genre-chip">Single-Player</span>
+              <span class="genre-chip">Full Controller Support</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Cover Box, Ratings, Metadata, Plugins -->
+        <div class="right-column">
+          
+          <!-- Cover & Ratings -->
+          <div class="cover-card-container">
+            <img class="game-cover wpf-target" data-wpf="PART_ImageCover & Age Rating" src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80" alt="Box Art">
+            
+            <div class="scores-box">
+              <div class="metacritic-badge wpf-target" data-wpf="Metacritic Score Pill">
+                <div class="score-circle">88</div>
+                <div class="score-meta">
+                  <div class="title">Metacritic</div>
+                  <div class="val">Generally Favorable</div>
+                </div>
+              </div>
+
+              <div class="metacritic-badge wpf-target" data-wpf="FiveStarScore Community Rating">
+                <div class="score-circle" style="background:#04a5ff; color:#fff;">4.8</div>
+                <div class="score-meta">
+                  <div class="title">Community</div>
+                  <div class="val">★★★★★</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metadata Table -->
+          <div class="meta-table wpf-target" data-wpf="Metadata Sidebar (Series, Dev, Pub, Release, Platform, Tags)">
+            <div class="meta-row">
+              <span class="meta-label">Series</span>
+              <span class="meta-val">Mythos Chronicles</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Developer</span>
+              <span class="meta-val">Ubisoft Montreal</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Publisher</span>
+              <span class="meta-val">Ubisoft</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Release Date</span>
+              <span class="meta-val">Nov 10, 2020</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Platform</span>
+              <span class="meta-val"><span class="platform-pill">PC / Windows 10</span></span>
+            </div>
+          </div>
+
+          <!-- Achievements Plugin Feed -->
+          <div class="plugin-section wpf-target" data-wpf="SuccessStory Achievements Plugin Grid">
+            <h3 class="section-title">Achievements (42/50)</h3>
+            <div class="achievements-grid">
+              <div class="achieve-slot unlocked" title="Viking Legend">🏆</div>
+              <div class="achieve-slot unlocked" title="Treasure Hunter">💎</div>
+              <div class="achieve-slot unlocked" title="Warrior's Oath">⚔️</div>
+              <div class="achieve-slot" title="Master of Runes">🔒</div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Technical Breakdown / Specifications Drawer -->
+  <footer class="info-footer">
+    <div class="inspector-panel">
+      <h2>⚙️ DetailsView Technical Blueprint Specifications</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">
+        The layout is organized via a master <code>Grid</code> with distinct row definitions and strict WPF data-binding bindings.
+      </p>
+
+      <div class="specs-grid">
+        <div class="spec-card">
+          <div class="title">Action & Status Bar</div>
+          <p style="color:var(--text-muted); font-size:0.85rem;">Height: 68px with glassmorphism (BackdropGlass1) and 40px accent play action.</p>
+          <span class="code">DetailsHeader &gt; HeaderRow [MinHeight=68]</span>
+        </div>
+
+        <div class="spec-card">
+          <div class="title">Primary Action Button</div>
+          <p style="color:var(--text-muted); font-size:0.85rem;">Sized to 40px height with LOCPlayGame text and Primary Accent Gradient.</p>
+          <span class="code">PART_ButtonPlayAction [Style=PlayButton]</span>
+        </div>
+
+        <div class="spec-card">
+          <div class="title">Media / Video Player</div>
+          <p style="color:var(--text-muted); font-size:0.85rem;">Fixed MaxHeight 340px with strict DataTriggers for ExtraMetadataLoader.</p>
+          <span class="code">MediaPreviewGrid &gt; ExtraMetadataLoader</span>
+        </div>
+
+        <div class="spec-card">
+          <div class="title">Storage & Directory</div>
+          <p style="color:var(--text-muted); font-size:0.85rem;">Formatted disk size and interactive path button that opens explorer on click.</p>
+          <span class="code">PART_ElemInstallSize, PART_ElemInstallDirectory</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let isVideoEnabled = true;
+    let isInspectorMode = false;
+
+    function toggleVideoState() {
+      isVideoEnabled = !isVideoEnabled;
+      const btn = document.getElementById('btnToggleVideo');
+      const card = document.getElementById('videoCard');
+      const img = document.getElementById('videoImg');
+      
+      if (isVideoEnabled) {
+        btn.classList.add('active');
+        btn.innerHTML = '<span>🎬 Video: Enabled</span>';
+        card.style.display = 'block';
+      } else {
+        btn.classList.remove('active');
+        btn.innerHTML = '<span>🎬 Video: Disabled (Area Collapsed)</span>';
+        card.style.display = 'none';
+      }
+    }
+
+    function toggleInspectorMode() {
+      isInspectorMode = !isInspectorMode;
+      const btn = document.getElementById('btnToggleInspector');
+      btn.classList.toggle('active', isInspectorMode);
+
+      const targets = document.querySelectorAll('.wpf-target');
+      targets.forEach(target => {
+        if (isInspectorMode) {
+          target.classList.add('wpf-inspected');
+          const wpfName = target.getAttribute('data-wpf') || 'WPF Element';
+          let pill = target.querySelector('.wpf-tag-pill');
+          if (!pill) {
+            pill = document.createElement('div');
+            pill.className = 'wpf-tag-pill';
+            pill.innerText = wpfName;
+            target.appendChild(pill);
+          }
+        } else {
+          target.classList.remove('wpf-inspected');
+          const pill = target.querySelector('.wpf-tag-pill');
+          if (pill) pill.remove();
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<UserControl x:Class="MythosHelper.Settings.MythosHelperSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20">
+
+            <!-- Section: Layout -->
+            <TextBlock Text="Layout" FontSize="18" FontWeight="Bold" Margin="0,0,0,12"/>
+
+            <DockPanel Margin="0,0,0,12">
+                <TextBlock Text="Header Behavior:" VerticalAlignment="Center" Width="180"/>
+                <ComboBox ItemsSource="{Binding HeaderBehaviorOptions, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                          SelectedItem="{Binding HeaderBehaviorSetting}" VerticalAlignment="Center" Width="150" HorizontalAlignment="Right" Margin="0,0,8,0"/>
+            </DockPanel>
+
+            <DockPanel Margin="0,0,0,12">
+                <TextBlock Text="Content Column Ratio:" VerticalAlignment="Center" Width="180"/>
+                <TextBlock Text="{Binding ColumnRatio, StringFormat={}{0:P0}}" VerticalAlignment="Center"
+                           HorizontalAlignment="Right" Width="50" TextAlignment="Right" Margin="0,0,8,0"/>
+                <Slider Minimum="0.5" Maximum="0.9" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                        Value="{Binding ColumnRatio}" VerticalAlignment="Center"/>
+            </DockPanel>
+
+            <Separator Margin="0,8,0,16"/>
+
+            <!-- Section: Header Metadata Fields -->
+            <TextBlock Text="Header Bar Fields" FontSize="18" FontWeight="Bold" Margin="0,0,0,12"/>
+
+            <CheckBox Content="Show Last Played" IsChecked="{Binding ShowLastPlayed}" Margin="0,0,0,8"/>
+            <CheckBox Content="Show Time Played" IsChecked="{Binding ShowTimePlayed}" Margin="0,0,0,8"/>
+            <CheckBox Content="Show Install Size" IsChecked="{Binding ShowInstallSize}" Margin="0,0,0,8"/>
+            <CheckBox Content="Show Install Folder" IsChecked="{Binding ShowInstallFolder}" Margin="0,0,0,8"/>
+            <CheckBox Content="Show Completion Status" IsChecked="{Binding ShowCompletionStatus}" Margin="0,0,0,8"/>
+
+            <Separator Margin="0,8,0,16"/>
+
+            <!-- Section: Video -->
+            <TextBlock Text="Video Player" FontSize="18" FontWeight="Bold" Margin="0,0,0,12"/>
+
+            <DockPanel Margin="0,0,0,12">
+                <TextBlock Text="Player Height (px):" VerticalAlignment="Center" Width="180"/>
+                <TextBlock Text="{Binding VideoPlayerHeight, StringFormat={}{0:0}}" VerticalAlignment="Center"
+                           HorizontalAlignment="Right" Width="50" TextAlignment="Right" Margin="0,0,8,0"/>
+                <Slider Minimum="100" Maximum="600" TickFrequency="25" IsSnapToTickEnabled="True"
+                        Value="{Binding VideoPlayerHeight}" VerticalAlignment="Center"/>
+            </DockPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

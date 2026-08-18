@@ -1,0 +1,22 @@
+# Reference and unrelated files
+__ReferenceThemes/
+.agent/
+*.mkv
+*.mp4
+*.webm
+lastChanged.json
+*.py
+
+# Build outputs
+Plugin/bin/
+Plugin/obj/
+[Bb]in/
+[Oo]bj/
+
+# IDE / Editor files
+.vs/
+*.user
+*.suo
+*.sln.docstates
+.vscode/
+.idea/
