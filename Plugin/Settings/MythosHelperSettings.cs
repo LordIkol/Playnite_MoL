@@ -21,8 +21,15 @@ namespace MythosHelper.Settings
         public HeaderBehavior HeaderBehaviorSetting
         {
             get => _headerBehavior;
-            set => SetValue(ref _headerBehavior, value);
+            set
+            {
+                SetValue(ref _headerBehavior, value);
+                OnPropertyChanged(nameof(HeaderMode));
+            }
         }
+
+        [DontSerialize]
+        public string HeaderMode => _headerBehavior.ToString();
 
         private double _columnRatio = 0.7;
         /// <summary>Left column width proportion (0.5 to 0.9). Right column is the remainder.</summary>

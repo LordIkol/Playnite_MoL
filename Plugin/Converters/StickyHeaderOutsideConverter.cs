@@ -19,18 +19,14 @@ namespace MythosHelper.Converters
                 return 0.0;
 
             double scrollOffset = System.Convert.ToDouble(value);
-            double anchor = StickyOffsetConverter.AnchorHeight;
-            if (anchor <= 0)
-            {
-                anchor = 150.0;
-            }
+            double anchor = StickyOffsetConverter.AnchorHeight; // same static anchor
             
             var settings = MythosHelperPlugin.Instance?.Settings;
             if (settings != null)
             {
                 if (settings.HeaderBehaviorSetting == Settings.HeaderBehavior.TopFixed)
                 {
-                    return 60.0; // Always fixed below the 60px TopPanel
+                    return 0.0; // Always at top
                 }
                 else if (settings.HeaderBehaviorSetting == Settings.HeaderBehavior.BelowBanner)
                 {

@@ -36,7 +36,8 @@ try {
     Copy-Item $pluginDll -Destination $pluginExtDest -Force
     Copy-Item $pluginManifest -Destination $pluginExtDest -Force
     Write-Host "Plugin deployed successfully to $pluginExtDest" -ForegroundColor Green
-} catch {
+}
+catch {
     Write-Warning "Could not copy DLL - Playnite is likely running. Close Playnite or run with -KillPlaynite."
     Write-Warning $_.Exception.Message
 }
@@ -61,11 +62,8 @@ foreach ($dir in $directories) {
     $srcDir = Join-Path $themeSource $dir
     $destDir = Join-Path $themeDest $dir
     if (Test-Path $srcDir) {
-        Write-Host "Copying directory $dir..."
-        if (-not (Test-Path $destDir)) {
-            New-Item -ItemType Directory -Path $destDir -Force | Out-Null
-        }
-        Copy-Item -Path "$srcDir\*" -Destination $destDir -Recurse -Force
+        Write-Host "Syncing directory $dir..."
+        robocopy $srcDir $destDir /MIR /NFL /NDL /NJH /NJS | Out-Null
     }
 }
 
@@ -90,3 +88,4 @@ foreach ($file in $files) {
 Write-Host "`n=== Deployment Complete ===" -ForegroundColor Green
 Write-Host "Theme copied to: $themeDest"
 Write-Host "Plugin copied to: $pluginExtDest"
+

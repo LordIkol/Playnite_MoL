@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using MythosHelper.Settings;
 
 namespace MythosHelper.Converters
 {
@@ -15,7 +16,11 @@ namespace MythosHelper.Converters
         {
             if (value != null && value != DependencyProperty.UnsetValue)
             {
-                StickyOffsetConverter.AnchorHeight = System.Convert.ToDouble(value);
+                double h = System.Convert.ToDouble(value);
+                if (h > 0)
+                {
+                    StickyOffsetConverter.AnchorHeight = h;
+                }
             }
             return value;
         }
@@ -27,15 +32,14 @@ namespace MythosHelper.Converters
     }
 
     /// <summary>
-    /// Computes the Y offset needed to make an element "sticky" inside a ScrollViewer.
-    /// Uses a static AnchorHeight updated by SetAnchorHeightConverter to avoid Playnite MultiBinding issues.
-    /// Input: ScrollViewer.VerticalOffset
-    /// Returns: Max(0, VerticalOffset - AnchorHeight)
+    /// Computes the Y offset for DetailsHeader based on HeaderBehaviorSetting:
+    /// - Sticky: Math.Max(0, scrollOffset - anchor)
+    /// - BelowBanner: scrollOffset (banner and bar stay fixed together)
+    /// - TopFixed: scrollOffset - (anchor + 68) (bar fixed at top of screen above banner)
     /// </summary>
     public class StickyOffsetConverter : IValueConverter
     {
-        // Globally shared anchor height, updated by SetAnchorHeightConverter
-        public static double AnchorHeight { get; set; } = 0.0;
+        public static double AnchorHeight { get; set; } = 250.0;
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -43,22 +47,88 @@ namespace MythosHelper.Converters
                 return 0.0;
 
             double scrollOffset = System.Convert.ToDouble(value);
-            
-            var settings = MythosHelperPlugin.Instance?.Settings;
-            if (settings != null)
-            {
-                if (settings.HeaderBehaviorSetting == Settings.HeaderBehavior.TopFixed)
-                {
-                    return scrollOffset - AnchorHeight; // Offset so it locks to Y=0 from the very top
-                }
-                else if (settings.HeaderBehaviorSetting == Settings.HeaderBehavior.BelowBanner)
-                {
-                    return 0.0; // Never offset, let it scroll away naturally
-                }
-            }
+            double anchor = AnchorHeight > 0 ? AnchorHeight : 250.0;
 
-            // Default: Sticky
-            return Math.Max(0.0, scrollOffset - AnchorHeight);
+            var behavior = MythosHelperPlugin.Instance?.Settings?.HeaderBehaviorSetting ?? HeaderBehavior.Sticky;
+            if (behavior == HeaderBehavior.BelowBanner)
+            {
+                return scrollOffset;
+            }
+            else if (behavior == HeaderBehavior.TopFixed)
+            {
+                return scrollOffset - anchor;
+            }
+            else
+            {
+                return Math.Max(0.0, scrollOffset - anchor);
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+    /// <summary>
+    /// Computes the Y offset for HeaderImagesGrid (Banner):
+    /// - BelowBanner: scrollOffset (banner stays fixed at top)
+    /// - Sticky / TopFixed: 0.0 (scrolls naturally)
+    /// </summary>
+    public class BannerOffsetConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || value == DependencyProperty.UnsetValue)
+                return 0.0;
+
+            double scrollOffset = System.Convert.ToDouble(value);
+            var behavior = MythosHelperPlugin.Instance?.Settings?.HeaderBehaviorSetting ?? HeaderBehavior.Sticky;
+            if (behavior == HeaderBehavior.BelowBanner)
+            {
+                return scrollOffset;
+            }
+            return 0.0;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+    /// <summary>
+    /// Computes the Margin for HeaderImagesGrid (Banner).
+    /// </summary>
+    public class BannerMarginConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return new Thickness(0);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+    /// <summary>
+    /// Computes the Y offset to keep the header fixed at the very top of the viewport (Y=0).
+    /// Input: ScrollViewer.VerticalOffset
+    /// Returns: VerticalOffset - AnchorHeight
+    /// </summary>
+    public class TopFixedOffsetConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || value == DependencyProperty.UnsetValue)
+                return 0.0;
+
+            double scrollOffset = System.Convert.ToDouble(value);
+            double anchor = StickyOffsetConverter.AnchorHeight > 0 ? StickyOffsetConverter.AnchorHeight : 250.0;
+
+            return scrollOffset - anchor;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

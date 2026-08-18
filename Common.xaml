@@ -224,42 +224,4 @@
         </Setter>
     </Style>
 
-    <Style x:Key="BannerToggleButton" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource BaseStyle}">
-        <Setter Property="Background" Value="{DynamicResource SecondaryButtonIdleBackgroundBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource ControlIdleBorderBrush}"/>
-        <Setter Property="Width" Value="36"/>
-        <Setter Property="Height" Value="36"/>
-        <Setter Property="Padding" Value="8"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="ToolTip" Value="Fold/Unfold Banner"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type ToggleButton}">
-                    <Border x:Name="Border" Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{DynamicResource ControlCornerRadius}">
-                        <Viewbox Stretch="Uniform" Margin="{TemplateBinding Padding}">
-                            <TextBlock x:Name="BannerIcon" Text="&#xE70E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                       FontSize="14" Foreground="{TemplateBinding Foreground}"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Viewbox>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Text" Value="&#xE70D;" TargetName="BannerIcon"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource AccentHighlightBrush}" TargetName="Border"/>
-                            <Setter Property="Background" Value="{DynamicResource SecondaryButtonHoverBackgroundBrush}" TargetName="Border"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource SecondaryButtonHoverBackgroundBrush}" TargetName="Border"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
 </ResourceDictionary>

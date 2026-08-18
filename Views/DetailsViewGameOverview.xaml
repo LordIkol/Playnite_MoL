@@ -10,25 +10,43 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type DetailsViewGameOverview}">
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                        <ScrollViewer x:Name="PART_ScrollViewHost"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto" 
+                                      Style="{DynamicResource DetailsScrollViewer}"
+                                      d:DesignWidth="1280"
+                                      d:DesignHeight="1280"
+                                      d:DataContext="{x:Static DesignMainViewModel.DesignSelectedGameDetailsIntance}">
+                            <Grid Margin="0,0,0,40">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
 
-                        <!-- FIXED TOP HERO SECTION: BANNER & ACTION BAR -->
-                        <StackPanel Grid.Row="0" Panel.ZIndex="10">
-                            <!-- ROW 0: HEADER BANNER IMAGE (MinHeight: 150px) -->
-                                    <Grid Name="HeaderImagesGrid" MinHeight="150" Height="{Settings CalculatedGameDetailsIndentation}">
-                                        <Grid.Style>
-                                            <Style TargetType="Grid">
-                                                <Setter Property="Visibility" Value="Visible"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ElementName=BannerToggleButton, Path=IsChecked}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Grid.Style>
+                                <!-- ROW 0: HEADER BANNER IMAGE (MinHeight: 150px) -->
+                                <Grid Grid.Row="0" Name="HeaderImagesGrid" Panel.ZIndex="9998" MinHeight="150" Height="{Settings CalculatedGameDetailsIndentation}"
+                                      Tag="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=SetAnchorHeightConverter}}">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Setter Property="RenderTransform">
+                                                <Setter.Value>
+                                                    <TranslateTransform Y="{Binding ElementName=PART_ScrollViewHost, Path=VerticalOffset, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=BannerOffsetConverter}}" />
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <!-- Mode: BelowBanner (Keep Banner + Bar fixed at top) -->
+                                                <DataTrigger Binding="{PluginSettings Plugin=MythosHelper_Loki, Path=HeaderMode}" Value="BelowBanner">
+                                                    <Setter Property="RenderTransform">
+                                                        <Setter.Value>
+                                                            <TranslateTransform Y="{Binding ElementName=PART_ScrollViewHost, Path=VerticalOffset}" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <Border Background="#141417" />
                                         <!-- Background Image underlay -->
                                         <Grid Name="BorderImageBackground">
                                             <Grid.OpacityMask>
@@ -169,144 +187,10 @@
                                                 <ContentControl x:Name="GogSecondClassWatcher_SecondClassWatcherControl" />
                                             </Border>
                                         </StackPanel>
-                                    </Grid><!-- ROW 1: ACTION & STATUS BAR (Declared AFTER Row 2 with Panel.ZIndex="999" so content scrolls BEHIND it) -->
-                            <!-- ROW 1: ACTION & STATUS BAR -->
-                                <Grid  Name="DetailsHeader">
-                                    <Border Background="{DynamicResource BackdropGlass1}"/>
-                                    <Border Padding="40,14,40,14" MinHeight="68" x:Name="HeaderRow"
-                                            BorderBrush="{DynamicResource ContentBorderBrushOverlay}"
-                                            BorderThickness="0,1,0,1">
-                                        <DockPanel LastChildFill="True">
-                                            
-                                            <!-- LEFT ACTIONS: Play, Install/Context, More Actions -->
-                                            <DockPanel HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,30,0" DockPanel.Dock="Left">
-                                                <Button Name="PART_ButtonPlayAction" Style="{DynamicResource PlayButton}" />
-                                                <Button Name="PART_ButtonContextAction" Style="{DynamicResource ContextButton}" Margin="8,0,0,0"/>
-                                                <Button Name="PART_ButtonMoreActions" Style="{DynamicResource MoreActionsButton}" Margin="8,0,0,0"/>
-                                            </DockPanel>
+                                                                        </Grid>
 
-                                            <!-- RIGHT QUICK TOOLS: Edit Game, Panel Toggle, Favorite Toggle, PlayState -->
-                                            <DockPanel DockPanel.Dock="Right" VerticalAlignment="Center" Margin="25,0,0,0">
-                                                <ContentControl x:Name="PlayState_GameStateSwitchControl" Margin="8,0,0,0"
-                                                                Visibility="{PluginSettings Plugin=PlayState, Path=IsControlVisible, FallbackValue=Collapsed, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                    <ContentControl.Resources>
-                                                        <Style TargetType="Button" BasedOn="{StaticResource DetailsSemiTransparentButton}">
-                                                            <Setter Property="Width" Value="36" />
-                                                            <Setter Property="Height" Value="36" />
-                                                        </Style>
-                                                    </ContentControl.Resources>
-                                                </ContentControl>
-                                                <Button x:Name="PART_ButtonEditGame" Focusable="False" Height="36" Width="36"
-                                                        Style="{DynamicResource DetailsViewEditButton}" Margin="8,0,0,0"/>
-                                                <ToggleButton Name="PanelToggleButton" Margin="8,0,0,0" Focusable="False" Height="36" Width="36"
-                                                              Style="{DynamicResource PannelToggleButton}" IsChecked="{DynamicResource DetailsViewShowInfoPanelDefault}"/>
-                                                <ToggleButton Name="GameFavoriteToggleButton" Margin="8,0,0,0" Focusable="False" Height="36" Width="36"
-                                                              Style="{DynamicResource PannelFavoriteToggleButton}"
-                                                              Visibility="{PluginStatus Plugin=felixkmh_Extras_Plugin}"
-                                                              IsChecked="{PluginSettings Plugin=ThemeExtras, Path=Game.Favorite, Mode=TwoWay, FallbackValue={StaticResource False}}"/>
-                                                <ToggleButton Name="BannerToggleButton" Margin="8,0,0,0" Focusable="False" Height="36" Width="36"
-                                                              Style="{DynamicResource BannerToggleButton}"/>
-                                            </DockPanel>
-
-                                            <!-- CENTER STATUS METADATA: Last Played, Time Played, Install Size, Install Folder, Completion Status -->
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                
-                                                <!-- LAST PLAYED -->
-                                                <DockPanel x:Name="PART_ElemLastPlayed" VerticalAlignment="Center" Margin="10,0,25,0">
-                                                    <TextBlock Text="&#xE823;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                                               FontSize="16" Foreground="{DynamicResource DetailsViewHeaderIconsFillBrush}"
-                                                               VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
-                                                        <Label Style="{DynamicResource HeaderLabel}" Content="{DynamicResource LOCMythos_RecentActivity}"/>
-                                                        <TextBlock x:Name="PART_TextLastActivity" Style="{DynamicResource HeaderTextBlock}"/>
-                                                    </StackPanel>
-                                                </DockPanel>
-
-                                                <!-- TIME PLAYED -->
-                                                <DockPanel x:Name="PART_ElemPlayTime" VerticalAlignment="Center" Margin="10,0,25,0">
-                                                    <TextBlock Text="&#xE916;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                                               FontSize="16" Foreground="{DynamicResource DetailsViewHeaderIconsFillBrush}"
-                                                               VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
-                                                        <Label Style="{DynamicResource HeaderLabel}" Content="{DynamicResource LOCMythos_PlayTime}"/>
-                                                        <TextBlock x:Name="PART_TextPlayTime" Style="{DynamicResource HeaderTextBlock}"/>
-                                                    </StackPanel>
-                                                </DockPanel>
-
-                                                <!-- INSTALL SIZE -->
-                                                <DockPanel x:Name="PART_ElemInstallSize" VerticalAlignment="Center" Margin="10,0,25,0">
-                                                    <TextBlock Text="&#xE74E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                                               FontSize="16" Foreground="{DynamicResource DetailsViewHeaderIconsFillBrush}"
-                                                               VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
-                                                        <Label Style="{DynamicResource HeaderLabel}" Content="{DynamicResource LOCInstallSizeLabel}"/>
-                                                        <TextBlock x:Name="PART_TextInstallSize" Style="{DynamicResource HeaderTextBlock}"/>
-                                                    </StackPanel>
-                                                </DockPanel>
-
-                                                <!-- INSTALL DIRECTORY -->
-                                                <DockPanel x:Name="PART_ElemInstallDirectory" VerticalAlignment="Center" Margin="10,0,25,0">
-                                                    <TextBlock Text="&#xED25;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                                               FontSize="16" Foreground="{DynamicResource DetailsViewHeaderIconsFillBrush}"
-                                                               VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
-                                                        <Label Style="{DynamicResource HeaderLabel}" Content="{DynamicResource LOCGameInstallDirTitle}"/>
-                                                        <Button x:Name="PART_ButtonInstallDirectory" MaxWidth="180" Cursor="Hand" Margin="0" Style="{DynamicResource PropertyItemButton}">
-                                                            <Button.Template>
-                                                                <ControlTemplate TargetType="Button">
-                                                                    <TextBlock FontSize="{DynamicResource FontSize}" FontWeight="SemiBold"
-                                                                               Foreground="{DynamicResource DetailsViewOverviewHeaderTextBlockBrush}"
-                                                                               Text="{TemplateBinding Content, Converter={StaticResource ObjectToStringConverter}}"
-                                                                               TextTrimming="CharacterEllipsis"/>
-                                                                </ControlTemplate>
-                                                            </Button.Template>
-                                                        </Button>
-                                                    </StackPanel>
-                                                </DockPanel>
-
-                                                <!-- COMPLETION STATUS -->
-                                                <StackPanel x:Name="PART_ElemCompletionStatus" VerticalAlignment="Center" Margin="10,0,20,0">
-                                                    <Label Style="{DynamicResource HeaderLabel}" Content="{DynamicResource LOCMythos_CompStatus}"/>
-                                                    <Border Tag="{PluginStatus Plugin=felixkmh_Extras_Plugin, Status=Installed}">
-                                                        <Border.Style>
-                                                            <Style TargetType="Border">
-                                                                <Setter Property="Visibility" Value="Visible" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
-                                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </Border.Style>
-                                                        <Button Name="PART_ButtonCompletionStatus" Style="{DynamicResource PropertyItemButton}" Margin="0" />
-                                                    </Border>
-                                                    <ContentControl Visibility="{PluginStatus Plugin=felixkmh_Extras_Plugin, Status=Installed}"
-                                                                    x:Name="ThemeExtras_SettableCompletionStatus">
-                                                        <ContentControl.Resources>
-                                                            <Style TargetType="UserControl" BasedOn="{StaticResource ThemeExtrasUserControlCompStatusStyle}" />
-                                                        </ContentControl.Resources>
-                                                    </ContentControl>
-                                                </StackPanel>
-
-                                            </StackPanel>
-
-                                        </DockPanel>
-                                    </Border>
-                                </Grid>
-                        </StackPanel>
-
-                        <!-- SCROLLABLE BOTTOM CONTENT SECTION -->
-                        <ScrollViewer Grid.Row="1"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      VerticalScrollBarVisibility="Auto"
-                                      Style="{DynamicResource DetailsScrollViewer}"
-                                      d:DesignWidth="1280"
-                                      d:DesignHeight="1280"
-                                      d:DataContext="{x:Static DesignMainViewModel.DesignSelectedGameDetailsIntance}"
-                                      x:Name="PART_ScrollViewHost">
-                            <Grid Margin="0,0,0,40">
                                 <!-- ROW 2: MAIN DETAILS CONTENT SECTION (70/30 PROPORTION) -->
-                                    <Grid  Panel.ZIndex="0" HorizontalAlignment="Stretch" Margin="60,30,60,0" SnapsToDevicePixels="True">
+                                <Grid Grid.Row="2" Panel.ZIndex="0" HorizontalAlignment="Stretch" Margin="60,30,60,0" SnapsToDevicePixels="True">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="7*"/>
                                         <ColumnDefinition Width="3*"/>
@@ -1933,6 +1817,164 @@
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
+                                
+                                </Grid>
+
+                                <!-- ROW 1: ACTION & STATUS BAR (Sticky overlay over Row 2) -->
+                                <Grid Grid.Row="1" Name="DetailsHeader" Panel.ZIndex="9999" VerticalAlignment="Top">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <!-- Default Fallback or Sticky mode -->
+                                            <Setter Property="RenderTransform">
+                                                <Setter.Value>
+                                                    <TranslateTransform Y="{Binding ElementName=PART_ScrollViewHost, Path=VerticalOffset, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=StickyOffsetConverter}}" />
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <!-- Mode: BelowBanner (Keep Banner + Bar fixed at top) -->
+                                                <DataTrigger Binding="{PluginSettings Plugin=MythosHelper_Loki, Path=HeaderMode}" Value="BelowBanner">
+                                                    <Setter Property="RenderTransform">
+                                                        <Setter.Value>
+                                                            <TranslateTransform Y="{Binding ElementName=PART_ScrollViewHost, Path=VerticalOffset}" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                                <!-- Mode: TopFixed (Always fixed at top of screen) -->
+                                                <DataTrigger Binding="{PluginSettings Plugin=MythosHelper_Loki, Path=HeaderMode}" Value="TopFixed">
+                                                    <Setter Property="RenderTransform">
+                                                        <Setter.Value>
+                                                            <TranslateTransform Y="{Binding ElementName=PART_ScrollViewHost, Path=VerticalOffset, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=TopFixedOffsetConverter}}" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+
+                                    <Border Background="{DynamicResource DetailsSectionBackgroundBrush}"/>
+                                    <Border Background="{DynamicResource BackdropGlass1}"/>
+                                    <Border Padding="40,14,40,14" MinHeight="68" x:Name="HeaderRow"
+                                            BorderBrush="{DynamicResource ContentBorderBrushOverlay}"
+                                            BorderThickness="0,1,0,1">
+                                        <DockPanel LastChildFill="True">
+                                            
+                                            <!-- LEFT ACTIONS: Play, Install/Context, More Actions -->
+                                            <DockPanel HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,30,0" DockPanel.Dock="Left">
+                                                <Button Name="PART_ButtonPlayAction" Style="{DynamicResource PlayButton}" />
+                                                <Button Name="PART_ButtonContextAction" Style="{DynamicResource ContextButton}" Margin="8,0,0,0"/>
+                                                <Button Name="PART_ButtonMoreActions" Style="{DynamicResource MoreActionsButton}" Margin="8,0,0,0"/>
+                                            </DockPanel>
+
+                                            <!-- RIGHT QUICK TOOLS: Edit Game, Panel Toggle, Favorite Toggle, PlayState -->
+                                            <DockPanel DockPanel.Dock="Right" VerticalAlignment="Center" Margin="25,0,0,0">
+                                                <ContentControl x:Name="PlayState_GameStateSwitchControl" Margin="8,0,0,0"
+                                                                Visibility="{PluginSettings Plugin=PlayState, Path=IsControlVisible, FallbackValue=Collapsed, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <ContentControl.Resources>
+                                                        <Style TargetType="Button" BasedOn="{StaticResource DetailsSemiTransparentButton}">
+                                                            <Setter Property="Width" Value="36" />
+                                                            <Setter Property="Height" Value="36" />
+                                                        </Style>
+                                                    </ContentControl.Resources>
+                                                </ContentControl>
+                                                <Button x:Name="PART_ButtonEditGame" Focusable="False" Height="36" Width="36"
+                                                        Style="{DynamicResource DetailsViewEditButton}" Margin="8,0,0,0"/>
+                                                <ToggleButton Name="PanelToggleButton" Margin="8,0,0,0" Focusable="False" Height="36" Width="36"
+                                                              Style="{DynamicResource PannelToggleButton}" IsChecked="{DynamicResource DetailsViewShowInfoPanelDefault}"/>
+                                                <ToggleButton Name="GameFavoriteToggleButton" Margin="8,0,0,0" Focusable="False" Height="36" Width="36"
+                                                              Style="{DynamicResource PannelFavoriteToggleButton}"
+                                                              Visibility="{PluginStatus Plugin=felixkmh_Extras_Plugin}"
+                                                              IsChecked="{PluginSettings Plugin=ThemeExtras, Path=Game.Favorite, Mode=TwoWay, FallbackValue={StaticResource False}}"/>
+                                            </DockPanel>
+
+                                            <!-- CENTER STATUS METADATA: Last Played, Time Played, Install Size, Install Folder, Completion Status -->
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                
+                                                <!-- LAST PLAYED -->
+                                                <DockPanel x:Name="PART_ElemLastPlayed" VerticalAlignment="Center" Margin="10,0,25,0"
+                                                           Visibility="{PluginSettings Plugin=MythosHelper_Loki, Path=ShowLastPlayed, FallbackValue=Visible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <TextBlock Text="&#xE823;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                               FontSize="16" Foreground="{DynamicResource DetailsViewHeaderIconsFillBrush}"
+                                                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                        <Label Style="{DynamicResource HeaderLabel}" Content="{DynamicResource LOCMythos_RecentActivity}"/>
+                                                        <TextBlock x:Name="PART_TextLastActivity" Style="{DynamicResource HeaderTextBlock}"/>
+                                                    </StackPanel>
+                                                </DockPanel>
+
+                                                <!-- TIME PLAYED -->
+                                                <DockPanel x:Name="PART_ElemPlayTime" VerticalAlignment="Center" Margin="10,0,25,0"
+                                                           Visibility="{PluginSettings Plugin=MythosHelper_Loki, Path=ShowTimePlayed, FallbackValue=Visible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <TextBlock Text="&#xE916;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                               FontSize="16" Foreground="{DynamicResource DetailsViewHeaderIconsFillBrush}"
+                                                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                        <Label Style="{DynamicResource HeaderLabel}" Content="{DynamicResource LOCMythos_PlayTime}"/>
+                                                        <TextBlock x:Name="PART_TextPlayTime" Style="{DynamicResource HeaderTextBlock}"/>
+                                                    </StackPanel>
+                                                </DockPanel>
+
+                                                <!-- INSTALL SIZE -->
+                                                <DockPanel x:Name="PART_ElemInstallSize" VerticalAlignment="Center" Margin="10,0,25,0"
+                                                           Visibility="{PluginSettings Plugin=MythosHelper_Loki, Path=ShowInstallSize, FallbackValue=Visible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <TextBlock Text="&#xE74E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                               FontSize="16" Foreground="{DynamicResource DetailsViewHeaderIconsFillBrush}"
+                                                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                        <Label Style="{DynamicResource HeaderLabel}" Content="{DynamicResource LOCInstallSizeLabel}"/>
+                                                        <TextBlock x:Name="PART_TextInstallSize" Style="{DynamicResource HeaderTextBlock}"/>
+                                                    </StackPanel>
+                                                </DockPanel>
+
+                                                <!-- INSTALL DIRECTORY -->
+                                                <DockPanel x:Name="PART_ElemInstallDirectory" VerticalAlignment="Center" Margin="10,0,25,0"
+                                                           Visibility="{PluginSettings Plugin=MythosHelper_Loki, Path=ShowInstallFolder, FallbackValue=Visible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <TextBlock Text="&#xED25;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                               FontSize="16" Foreground="{DynamicResource DetailsViewHeaderIconsFillBrush}"
+                                                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                        <Label Style="{DynamicResource HeaderLabel}" Content="{DynamicResource LOCGameInstallDirTitle}"/>
+                                                        <Button x:Name="PART_ButtonInstallDirectory" MaxWidth="180" Cursor="Hand" Margin="0" Style="{DynamicResource PropertyItemButton}">
+                                                            <Button.Template>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <TextBlock FontSize="{DynamicResource FontSize}" FontWeight="SemiBold"
+                                                                               Foreground="{DynamicResource DetailsViewOverviewHeaderTextBlockBrush}"
+                                                                               Text="{TemplateBinding Content, Converter={StaticResource ObjectToStringConverter}}"
+                                                                               TextTrimming="CharacterEllipsis"/>
+                                                                </ControlTemplate>
+                                                            </Button.Template>
+                                                        </Button>
+                                                    </StackPanel>
+                                                </DockPanel>
+
+                                                <!-- COMPLETION STATUS -->
+                                                <StackPanel x:Name="PART_ElemCompletionStatus" VerticalAlignment="Center" Margin="10,0,20,0"
+                                                            Visibility="{PluginSettings Plugin=MythosHelper_Loki, Path=ShowCompletionStatus, FallbackValue=Visible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <Label Style="{DynamicResource HeaderLabel}" Content="{DynamicResource LOCMythos_CompStatus}"/>
+                                                    <Border Tag="{PluginStatus Plugin=felixkmh_Extras_Plugin, Status=Installed}">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <Button Name="PART_ButtonCompletionStatus" Style="{DynamicResource PropertyItemButton}" Margin="0" />
+                                                    </Border>
+                                                    <ContentControl Visibility="{PluginStatus Plugin=felixkmh_Extras_Plugin, Status=Installed}"
+                                                                    x:Name="ThemeExtras_SettableCompletionStatus">
+                                                        <ContentControl.Resources>
+                                                            <Style TargetType="UserControl" BasedOn="{StaticResource ThemeExtrasUserControlCompStatusStyle}" />
+                                                        </ContentControl.Resources>
+                                                    </ContentControl>
+                                                </StackPanel>
+
+                                            </StackPanel>
+
+                                        </DockPanel>
+                                    </Border>
                                 </Grid>
                             </Grid>
                         </ScrollViewer>

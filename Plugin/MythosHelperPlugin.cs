@@ -35,6 +35,9 @@ namespace MythosHelper
                 Converters = new List<IValueConverter>
                 {
                     new StickyOffsetConverter(),
+                    new TopFixedOffsetConverter(),
+                    new BannerOffsetConverter(),
+                    new BannerMarginConverter(),
                     new SetAnchorHeightConverter(),
                     new SubtractConverter(),
                     new MultiplyConverter(),
