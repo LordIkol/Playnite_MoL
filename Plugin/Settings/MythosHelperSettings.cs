@@ -86,6 +86,21 @@ namespace MythosHelper.Settings
             set => SetValue(ref _videoPlayerHeight, value);
         }
 
+        // --- Filter Versioning (Live UI triggers) ---
+
+        private int _filterVersion = 0;
+        [DontSerialize]
+        public int FilterVersion
+        {
+            get => _filterVersion;
+            set => SetValue(ref _filterVersion, value);
+        }
+
+        public void IncrementFilterVersion()
+        {
+            FilterVersion++;
+        }
+
         // --- Serialization ---
 
         // Backup for cancel support

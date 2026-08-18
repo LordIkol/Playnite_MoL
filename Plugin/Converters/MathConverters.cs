@@ -91,4 +91,32 @@ namespace MythosHelper.Converters
             throw new NotSupportedException();
         }
     }
+
+    /// <summary>
+    /// Converts a collection or IEnumerable to Visibility.Visible if non-null and Count > 0, otherwise Visibility.Collapsed.
+    /// </summary>
+    public class HasItemsToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || value == DependencyProperty.UnsetValue)
+                return Visibility.Collapsed;
+
+            if (value is System.Collections.ICollection col)
+                return col.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+            if (value is System.Collections.IEnumerable enumVal)
+            {
+                var enumerator = enumVal.GetEnumerator();
+                return enumerator.MoveNext() ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
 }

@@ -5,6 +5,7 @@ using System.Windows.Data;
 using MythosHelper.Converters;
 using MythosHelper.Settings;
 using Playnite.SDK;
+using Playnite.SDK.Events;
 using Playnite.SDK.Plugins;
 
 namespace MythosHelper
@@ -41,7 +42,11 @@ namespace MythosHelper
                     new SetAnchorHeightConverter(),
                     new SubtractConverter(),
                     new MultiplyConverter(),
-                    new MathClampConverter()
+                    new MathClampConverter(),
+                    new HasItemsToVisibilityConverter(),
+                    new ToggleFilterCommandConverter(),
+                    new ClearMetadataFiltersCommandConverter(),
+                    new IsFilterActiveConverter()
                 }
             });
         }
@@ -54,6 +59,15 @@ namespace MythosHelper
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
             return new MythosHelperSettingsView();
+        }
+
+        public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
+        {
+            base.OnApplicationStarted(args);
+            System.Windows.Application.Current?.Dispatcher?.InvokeAsync(() =>
+            {
+                MythosHelper.Filters.FilterService.GetDatabaseFilters();
+            }, System.Windows.Threading.DispatcherPriority.Loaded);
         }
     }
 }

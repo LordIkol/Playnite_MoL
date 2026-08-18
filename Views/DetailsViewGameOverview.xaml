@@ -119,7 +119,39 @@
                                             <ContentControl x:Name="ExtraMetadataLoader_VideoLoaderControlAlternative" />
                                         </Border>
 
-                                        <!-- Centered Game Logo / Title -->
+                                                                                <!-- Left-Aligned Cover Image in Banner (Full Height) -->
+                                        <Grid HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="40,20,20,20" Panel.ZIndex="100">
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Settings DetailsVisibility.CoverImage}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Game.CoverImage}" Value="{x:Null}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
+                                            <Border Name="BannerCoverMask" Background="Black" CornerRadius="{DynamicResource GridCornerRadius}" />
+                                            <Border CornerRadius="{DynamicResource GridCornerRadius}"
+                                                    BorderBrush="{DynamicResource ContentBorderBrushOverlay}"
+                                                    BorderThickness="1">
+                                                <Border.Effect>
+                                                    <DropShadowEffect Color="Black" BlurRadius="16" ShadowDepth="4" Opacity="0.7"/>
+                                                </Border.Effect>
+                                                <Image Name="PART_ImageCover"
+                                                       Stretch="Uniform"
+                                                       VerticalAlignment="Stretch"
+                                                       RenderOptions.BitmapScalingMode="Fant"/>
+                                            </Border>
+                                            <Grid.OpacityMask>
+                                                <VisualBrush Visual="{Binding ElementName=BannerCoverMask}" />
+                                            </Grid.OpacityMask>
+                                        </Grid>
+
+<!-- Centered Game Logo / Title -->
                                         <Grid Panel.ZIndex="95" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,20,40,20">
                                             <!-- ExtraMetadataLoader Logo -->
                                             <ContentControl x:Name="ExtraMetadataLoader_LogoLoaderControl"
@@ -186,6 +218,32 @@
                                                     Visibility="{PluginSettings Plugin=GogSecondClassWatcher, Path=IsControlVisible, FallbackValue=Collapsed, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                 <ContentControl x:Name="GogSecondClassWatcher_SecondClassWatcherControl" />
                                             </Border>
+                                            <!-- Age Rating in Top Right Corner of Banner -->
+                                            <ItemsControl Name="PART_ElemAgeRating" ItemsSource="{Binding Game.AgeRatings}" Margin="0,8,0,0" HorizontalAlignment="Right">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Background="#CC000000"
+                                                                BorderBrush="{DynamicResource ContentBorderBrushOverlay}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="6"
+                                                                Padding="4"
+                                                                Margin="4,0,0,0">
+                                                            <Image x:Name="AgeRatingIcon"
+                                                                   Height="{Binding ElementName=HeaderImagesGrid, Path=ActualHeight, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=MultiplyConverter}, ConverterParameter=0.35}"
+                                                                   MaxHeight="120"
+                                                                   Source="{ThemeFileBinding Name, PathFormat='Images/AgeRating/{0}.png'}"
+                                                                   Stretch="Uniform"
+                                                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                                                   SnapsToDevicePixels="True"/>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
                                         </StackPanel>
                                                                         </Grid>
 
@@ -199,135 +257,18 @@
                                     <!-- Sidebar Column -->
                                     <StackPanel Grid.Column="1" Grid.Row="0" Margin="0">
                                         
-                                        <Grid HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,20" Tag="{DynamicResource DetailsViewDisableLogos}">
-                                            <Grid.Style>
-                                                <Style TargetType="Grid">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
-                                                            <Setter Property="Visibility" Value="Visible"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Grid.Style>
-                                            <Border Name="Mask" Background="Black" CornerRadius="{DynamicResource GridCornerRadius}" />
-                                            <Border>
-                                                <Image Name="PART_ImageCover" MaxHeight="{Settings GameDetailsCoverHeight}" MaxWidth="300"
-                                                       StretchDirection="Both" Stretch="Uniform"
-                                                       RenderOptions.BitmapScalingMode="Fant"/>
-                                            </Border>
-                                            <Grid>
-                                                <Border BorderBrush="{DynamicResource ContentBorderBrushOverlay}"
-                                                        BorderThickness="1"
-                                                        CornerRadius="{DynamicResource GridCornerRadius}"
-                                                        HorizontalAlignment="Stretch"
-                                                        VerticalAlignment="Stretch"
-                                                        Margin="0"
-                                                        IsHitTestVisible="False"/>
-                                            </Grid>
-                                            <Grid.OpacityMask>
-                                                <VisualBrush Visual="{Binding ElementName=Mask}" />
-                                            </Grid.OpacityMask>
-                                        </Grid>
-
-                                        <Grid Height="200" Margin="5,0,5,20" Tag="{DynamicResource DetailsViewDisableLogos}">
-                                            <Grid.Style>
-                                                <Style TargetType="Grid">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
-                                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Grid.Style>
-
-                                            <Border x:Name="GameIcon" CornerRadius="0">
-                                                <Image Name="PART_ImageIcon"
-                                                        VerticalAlignment="Center"
-                                                        HorizontalAlignment="Center"
-                                                        RenderOptions.BitmapScalingMode="Fant"
-                                                        MaxHeight="120"
-                                                        MaxWidth="120" />
-                                                <Border.Style>
-                                                    <Style TargetType="Border">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <!-- HowLongToBeat -->
+                                            <StackPanel Margin="0,0,0,25">
+                                                <StackPanel.Style>
+                                                    <Style TargetType="StackPanel">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{PluginSettings Plugin=ExtraMetadataLoader, Path=EnableLogos, FallbackValue=False}" Value="False">
-                                                                <Setter Property="Visibility" Value="Visible" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{PluginSettings Plugin=ExtraMetadataLoader, Path=IsLogoAvailable, FallbackValue=False}" Value="False">
-                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            <DataTrigger Binding="{PluginSettings Plugin=HowLongToBeat, Path=HasData, FallbackValue=False}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
-                                                </Border.Style>
-                                            </Border>
-
-                                            <Border x:Name="ExtraMetadataLoader_LogoLoaderControlGrid" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                <Border.Style>
-                                                    <Style TargetType="Border">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{PluginSettings Plugin=ExtraMetadataLoader, Path=EnableLogos, FallbackValue=False}" Value="False">
-                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{PluginSettings Plugin=ExtraMetadataLoader, Path=IsLogoAvailable, FallbackValue=False}" Value="False">
-                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Border.Style>
-                                                <ContentControl x:Name="ExtraMetadataLoader_LogoLoaderControlSecondary"/>
-                                            </Border>
-                                        </Grid>
-                                            
-                                        <!-- Age Rating and Action Area -->
-                                        <StackPanel Margin="0,0,0,10">
-
-                                            <ItemsControl Name="PART_ElemAgeRating" ItemsSource="{Binding Game.AgeRatings}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <Grid HorizontalAlignment="Center"/>
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemContainerStyle>
-                                                    <Style TargetType="ContentPresenter">
-                                                        <Setter Property="Grid.Column" Value="0"/>
-                                                        <Setter Property="Grid.Row" Value="0"/>
-                                                        <Setter Property="Panel.ZIndex" Value="0"/>
-                                                    </Style>
-                                                </ItemsControl.ItemContainerStyle>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom"
-                                                            Margin="0,0,0,20"
-                                                            SnapsToDevicePixels="True"
-                                                            UseLayoutRounding="True">
-
-                                                            <Border Background="Black"
-                                                                BorderBrush="{DynamicResource ContentBorderBrushOverlay}"
-                                                                    BorderThickness="1"
-                                                                    CornerRadius="10"/>
-
-                                                            <Image x:Name="AgeRatingIcon"
-                                                                MaxHeight="1024"
-                                                                MaxWidth="300"
-                                                                Source="{ThemeFileBinding Name, PathFormat='Images/AgeRating/{0}.png'}"
-                                                                StretchDirection="Both"
-                                                                Stretch="Uniform"
-                                                                RenderOptions.BitmapScalingMode="HighQuality"
-                                                                SnapsToDevicePixels="True"
-                                                                UseLayoutRounding="True"/>
-                                                        </Grid>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-
-                                        </StackPanel>
-
-                                            <!-- HowLongToBeat -->
-                                            <StackPanel Margin="0,0,0,25" Visibility="{PluginSettings Plugin=HowLongToBeat, Path=HasData, FallbackValue=Collapsed, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                </StackPanel.Style>
 
                                                 <Border CornerRadius="{DynamicResource ControlCornerRadius}" Background="Transparent" Margin="0">
 
@@ -415,8 +356,25 @@
                                                     </StackPanel>
                                                 </Border>
                                             </StackPanel>
-                                        <StackPanel Margin="0,0,0,20">
-                                            <StackPanel.Resources>
+                                        <!-- Game Details / Properties Card -->
+                                        <Border Margin="0,0,0,20"
+                                                Background="#08FFFFFF"
+                                                BorderBrush="{DynamicResource ContentBorderBrushOverlay}"
+                                                BorderThickness="1"
+                                                CornerRadius="{DynamicResource GridCornerRadius}"
+                                                Padding="16,14,16,10">
+                                            <StackPanel>
+                                                <!-- Header -->
+                                                <DockPanel Margin="0,0,0,8">
+                                                    <TextBlock Text="{DynamicResource LOCGameDetailsTitle}"
+                                                               Foreground="{DynamicResource SubtalBrush}"
+                                                               FontWeight="SemiBold"
+                                                               FontSize="13"
+                                                               VerticalAlignment="Center"/>
+                                                </DockPanel>
+
+                                                <StackPanel Grid.IsSharedSizeScope="True">
+                                                    <StackPanel.Resources>
                                                 <Style TargetType="ItemsControl">
                                                     <Setter Property="VerticalAlignment" Value="Center"/>
                                                     <Setter Property="Margin" Value="0,0,0,0" />
@@ -512,17 +470,7 @@
                                                         </Grid>
                                                     </Border>
 
-                                                    <!-- Series -->
-                                                    <Border x:Name="PART_ElemSeries" Padding="0,11,0,11" BorderBrush="{DynamicResource ContentBorderBrushOverlay}" BorderThickness="0,0,0,1" >
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto" SharedSizeGroup="Left"/>
-                                                                <ColumnDefinition Width="*" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <Label Grid.Column="0" Content="{DynamicResource LOCSeriesLabel}" VerticalAlignment="Center"/>
-                                                            <ItemsControl Grid.Column="1" Name="PART_ItemsSeries" HorizontalAlignment="Right" Margin="0,-4,4,0"/>
-                                                        </Grid>
-                                                    </Border>
+                                                    
 
                                                     <!-- Developers -->
                                                     <Border x:Name="PART_ElemDevelopers" Padding="0,11,0,11" BorderBrush="{DynamicResource ContentBorderBrushOverlay}" BorderThickness="0,0,0,1" >
@@ -596,17 +544,7 @@
                                                         </Grid>
                                                     </Border>
 
-                                                    <!--Categories -->
-                                                    <Border x:Name="PART_ElemCategories" Padding="0,11,0,11" BorderBrush="{DynamicResource ContentBorderBrushOverlay}" BorderThickness="0,0,0,1" >
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto" SharedSizeGroup="Left"/>
-                                                                <ColumnDefinition Width="*" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <Label Grid.Column="0" Content="{DynamicResource LOCGameCategoriesTitle}" VerticalAlignment="Center"/>
-                                                            <ItemsControl Grid.Column="1" Name="PART_ItemsCategories" HorizontalAlignment="Right" Margin="0,0,4,0"/>
-                                                        </Grid>
-                                                    </Border>
+                                                    
 
                                                     <!-- Library -->
                                                     <Border x:Name="PART_ElemLibrary" Padding="0,11,0,11" BorderBrush="{DynamicResource ContentBorderBrushOverlay}" BorderThickness="0,0,0,1" >
@@ -639,34 +577,10 @@
                                                         </Grid>
                                                     </Border>
                                         </StackPanel>
+                                            </StackPanel>
+                                        </Border>
 
-					<!--New Tags-->
-                                        <StackPanel Name="PART_ElemTags" Margin="0,0,0,10">
-                                            <TextBlock Text="{DynamicResource LOCMythos_Tags}"
-                                                        Foreground="{DynamicResource SubtalBrush}"
-                                                        FontWeight="Regular"
-                                                        FontSize="13"
-                                                        Margin="0,0,0,10" />
-
-                                            <Border CornerRadius="{DynamicResource ControlCornerRadius}" Background="Transparent" Margin="0">
-                                                <ItemsControl ItemsSource="{Binding Game.Tags}" Margin="0" Visibility="{Binding ElementName=PART_ElemTags, Path=Visibility}">
-                                                    <ItemsControl.ItemsPanel>
-                                                        <ItemsPanelTemplate>
-                                                            <WrapPanel Orientation="Horizontal" />
-                                                        </ItemsPanelTemplate>
-                                                    </ItemsControl.ItemsPanel>
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate DataType="{x:Type Tag}">
-                                                            <Button Content="{Binding Name}"
-                                                                    Style="{StaticResource FilterItemTagButton}"
-                                                                    Command="{Binding RelativeSource={RelativeSource AncestorType=ItemsControl}, Path=DataContext.SetTagFilterCommand}"
-                                                                    CommandParameter="{Binding}" />
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                </ItemsControl>
-                                            </Border>
-                                        </StackPanel>
-                                    </StackPanel>
+					</StackPanel>
                                     <!--Right Side Ends-->
 
                                     <!--Left Side-->
@@ -1272,93 +1186,7 @@
                                                         FontSize="16" />
                                         </StackPanel>
 
-                                            <Grid Tag="{DynamicResource DetailsViewGenreFeature}"
-							Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Tag, Converter={StaticResource BooleanToVisibilityConverter}}"
-							HorizontalAlignment="Stretch"
-							VerticalAlignment="Top" Margin="0,25,0,50">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-
-                                                <DockPanel Grid.Column="0">
-                                                    <Border Width="0" BorderThickness="0" Margin="0,0,0,0"
-                                                            Background="{DynamicResource PanelSeparatorBrush}" />
-                                                    <StackPanel x:Name="PART_ElemGenres">
-                                                        <StackPanel.Style>
-                                                            <Style TargetType="{x:Type StackPanel}">
-                                                                <Setter Property="Visibility" Value="Visible" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Settings DetailsVisibility.Genres}" Value="False">
-                                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                                    </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding Game.Genres}" Value="{x:Null}">
-                                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </StackPanel.Style>
-
-                                                        <Label Content="{StaticResource LOCGenresLabel}"
-                                                               Foreground="{DynamicResource TextBrushDarker}" FontSize="{StaticResource FontSize}" FontWeight="Medium"/>
-                                                        <Grid Margin="0,5,0,0">
-                                                            <ItemsControl ItemsSource="{Binding Game.Genres}" Margin="0,4,0,0">
-                                                                <ItemsControl.ItemsPanel>
-                                                                    <ItemsPanelTemplate>
-                                                                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center"/>
-                                                                    </ItemsPanelTemplate>
-                                                                </ItemsControl.ItemsPanel>
-                                                                <ItemsControl.ItemTemplate>
-                                                                    <DataTemplate>
-                                                                        <Button Content="{Binding Name}" Style="{StaticResource PropertyItemTagButton}"
-                                                                        Command="{Binding DataContext.SetGenreFilterCommand, RelativeSource={RelativeSource AncestorType={x:Type Grid}}}"
-                                                                        CommandParameter="{Binding}"/>
-                                                                    </DataTemplate>
-                                                                </ItemsControl.ItemTemplate>
-                                                            </ItemsControl>
-                                                        </Grid>
-                                                    </StackPanel>
-                                                </DockPanel>
-
-                                                <DockPanel Grid.Column="1">
-                                                    <Border Width="1" BorderThickness="0" Margin="0,0,18,0"
-                                                            Background="{DynamicResource PanelSeparatorBrush}" />
-                                                    <StackPanel x:Name="PART_ElemFeatures">
-                                                        <StackPanel.Style>
-                                                            <Style TargetType="{x:Type StackPanel}">
-                                                                <Setter Property="Visibility" Value="Visible" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Settings DetailsVisibility.Features}" Value="False">
-                                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                                    </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding Game.Genres}" Value="{x:Null}">
-                                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </StackPanel.Style>
-
-                                                        <Label Content="{StaticResource LOCFeaturesLabel}"
-                                                               Foreground="{DynamicResource TextBrushDarker}" FontSize="{StaticResource FontSize}" FontWeight="Medium"/>
-                                                        <Grid Margin="0,5,0,0">
-                                                            <ItemsControl ItemsSource="{Binding Game.Features}" Margin="0,4,0,0">
-                                                                <ItemsControl.ItemsPanel>
-                                                                    <ItemsPanelTemplate>
-                                                                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center"/>
-                                                                    </ItemsPanelTemplate>
-                                                                </ItemsControl.ItemsPanel>
-                                                                <ItemsControl.ItemTemplate>
-                                                                    <DataTemplate>
-                                                                        <Button Content="{Binding Name}" Style="{StaticResource PropertyItemTagButton}"
-                                                                        Command="{Binding DataContext.SetFeatureFilterCommand, RelativeSource={RelativeSource AncestorType={x:Type Grid}}}"
-                                                                        CommandParameter="{Binding}"/>
-                                                                    </DataTemplate>
-                                                                </ItemsControl.ItemTemplate>
-                                                            </ItemsControl>
-                                                        </Grid>
-                                                    </StackPanel>
-                                                </DockPanel>
-                                            </Grid>
+                                            
 
                                             <!-- SuccessStory-->
                                             <StackPanel Margin="0,0,0,40"
@@ -1851,7 +1679,10 @@
                                         </Style>
                                     </Grid.Style>
 
-                                    <Border Background="{DynamicResource DetailsSectionBackgroundBrush}"/>
+                                    <StackPanel>
+                                        <!-- ACTION & STATUS ROW -->
+                                        <Grid>
+                                            <Border Background="{DynamicResource DetailsSectionBackgroundBrush}"/>
                                     <Border Background="{DynamicResource BackdropGlass1}"/>
                                     <Border Padding="40,14,40,14" MinHeight="68" x:Name="HeaderRow"
                                             BorderBrush="{DynamicResource ContentBorderBrushOverlay}"
@@ -1884,6 +1715,17 @@
                                                               Style="{DynamicResource PannelFavoriteToggleButton}"
                                                               Visibility="{PluginStatus Plugin=felixkmh_Extras_Plugin}"
                                                               IsChecked="{PluginSettings Plugin=ThemeExtras, Path=Game.Favorite, Mode=TwoWay, FallbackValue={StaticResource False}}"/>
+                                                <ToggleButton Name="ToggleChipsRowButton" Margin="8,0,0,0" Focusable="False" Height="36" Width="36"
+                                                              IsChecked="True"
+                                                              ToolTip="{DynamicResource LOCMythos_Tags}"
+                                                              Style="{DynamicResource DetailsSemiTransparentToggleButton}">
+                                                    <TextBlock Text="&#xE8EC;"
+                                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                               FontSize="16"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               VerticalAlignment="Center"
+                                                               HorizontalAlignment="Center"/>
+                                                </ToggleButton>
                                             </DockPanel>
 
                                             <!-- CENTER STATUS METADATA: Last Played, Time Played, Install Size, Install Folder, Completion Status -->
@@ -1975,6 +1817,332 @@
 
                                         </DockPanel>
                                     </Border>
+                                        </Grid>
+
+                                        <!-- ATTACHED FIXED & HIDABLE CHIPS & FILTER BAR -->
+                                        <Grid x:Name="AttachedChipsBar"
+                                              Visibility="{Binding ElementName=ToggleChipsRowButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <Border Background="#16161A"/>
+                                            <Border Background="{DynamicResource BackdropGlass1}"/>
+                                            <Border BorderBrush="{DynamicResource ContentBorderBrushOverlay}" BorderThickness="0,1,0,1" Padding="40,6,40,6">
+                                                <DockPanel LastChildFill="True">
+                                                    <!-- Clear Filters Brush Button -->
+                                                    <Button ToolTip="{DynamicResource LOCClearFilters}"
+                                                            Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ClearMetadataFiltersCommandConverter}}"
+                                                            Style="{StaticResource DetailsSemiTransparentButton}"
+                                                            Height="30" Width="30" Margin="0,0,16,0"
+                                                            DockPanel.Dock="Left" VerticalAlignment="Center"
+                                                            Cursor="Hand">
+                                                        <TextBlock Text="&#xED62;"
+                                                                   FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                                   FontSize="13"
+                                                                   Foreground="{DynamicResource TextBrush}"
+                                                                   VerticalAlignment="Center"
+                                                                   HorizontalAlignment="Center"/>
+                                                    </Button>
+
+                                                    <!-- COLLAPSIBLE CHIPS WRAPPANEL -->
+                                                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        
+                                                        <!-- Series Group -->
+                                                        <WrapPanel Orientation="Horizontal" Margin="0,0,24,6">
+                                                            <WrapPanel.Style>
+                                                                <Style TargetType="WrapPanel">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Game.Series, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=HasItemsToVisibilityConverter}}" Value="Visible">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Settings DetailsVisibility.Series}" Value="False">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </WrapPanel.Style>
+                                                            
+                                                            <!-- Series Header Badge -->
+                                                            <Border Background="#358A5CF6"
+                                                                    BorderBrush="#80A855F7"
+                                                                    BorderThickness="1.5"
+                                                                    CornerRadius="6"
+                                                                    Padding="8,5,10,5"
+                                                                    Margin="0,2,8,6"
+                                                                    VerticalAlignment="Center"
+                                                                    ToolTip="{DynamicResource LOCSeriesLabel}">
+                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                    <TextBlock Text="&#xE82D;"
+                                                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                                               FontSize="11"
+                                                                               Foreground="#E9D5FF"
+                                                                               VerticalAlignment="Center"/>
+                                                                    <TextBlock Text="{DynamicResource LOCSeriesLabel}"
+                                                                               FontSize="11"
+                                                                               FontWeight="Bold"
+                                                                               Foreground="#FFFFFF"
+                                                                               Margin="6,0,0,0"
+                                                                               VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </Border>
+
+                                                            <!-- Series Items -->
+                                                            <ItemsControl x:Name="PART_ElemSeries" ItemsSource="{Binding Game.Series}">
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <WrapPanel Orientation="Horizontal" />
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Button Content="{Binding Name}"
+                                                                                Tag="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=IsFilterActiveConverter}, ConverterParameter=Series}"
+                                                                                Style="{StaticResource PropertyItemSeriesButton}"
+                                                                                Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Series}"
+                                                                                CommandParameter="{Binding}" />
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </WrapPanel>
+
+                                                        <!-- Genres Group -->
+                                                        <WrapPanel Orientation="Horizontal" Margin="0,0,24,6">
+                                                            <WrapPanel.Style>
+                                                                <Style TargetType="WrapPanel">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Game.Genres, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=HasItemsToVisibilityConverter}}" Value="Visible">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Settings DetailsVisibility.Genres}" Value="False">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </WrapPanel.Style>
+
+                                                            <!-- Genres Header Badge -->
+                                                            <Border Background="#350284C7"
+                                                                    BorderBrush="#8038BDF8"
+                                                                    BorderThickness="1.5"
+                                                                    CornerRadius="6"
+                                                                    Padding="8,5,10,5"
+                                                                    Margin="0,2,8,6"
+                                                                    VerticalAlignment="Center"
+                                                                    ToolTip="{DynamicResource LOCGenresLabel}">
+                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                    <TextBlock Text="&#xE790;"
+                                                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                                               FontSize="11"
+                                                                               Foreground="#BAE6FD"
+                                                                               VerticalAlignment="Center"/>
+                                                                    <TextBlock Text="{DynamicResource LOCGenresLabel}"
+                                                                               FontSize="11"
+                                                                               FontWeight="Bold"
+                                                                               Foreground="#FFFFFF"
+                                                                               Margin="6,0,0,0"
+                                                                               VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </Border>
+
+                                                            <!-- Genres Items -->
+                                                            <ItemsControl x:Name="PART_ElemGenres" ItemsSource="{Binding Game.Genres}">
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <WrapPanel Orientation="Horizontal" />
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Button Content="{Binding Name}"
+                                                                                Tag="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=IsFilterActiveConverter}, ConverterParameter=Genre}"
+                                                                                Style="{StaticResource PropertyItemGenreButton}"
+                                                                                Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Genre}"
+                                                                                CommandParameter="{Binding}" />
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </WrapPanel>
+
+                                                        <!-- Features Group -->
+                                                        <WrapPanel Orientation="Horizontal" Margin="0,0,24,6">
+                                                            <WrapPanel.Style>
+                                                                <Style TargetType="WrapPanel">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Game.Features, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=HasItemsToVisibilityConverter}}" Value="Visible">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Settings DetailsVisibility.Features}" Value="False">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </WrapPanel.Style>
+
+                                                            <!-- Features Header Badge -->
+                                                            <Border Background="#35059669"
+                                                                    BorderBrush="#8034D399"
+                                                                    BorderThickness="1.5"
+                                                                    CornerRadius="6"
+                                                                    Padding="8,5,10,5"
+                                                                    Margin="0,2,8,6"
+                                                                    VerticalAlignment="Center"
+                                                                    ToolTip="{DynamicResource LOCFeaturesLabel}">
+                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                    <TextBlock Text="&#xE768;"
+                                                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                                               FontSize="11"
+                                                                               Foreground="#A7F3D0"
+                                                                               VerticalAlignment="Center"/>
+                                                                    <TextBlock Text="{DynamicResource LOCFeaturesLabel}"
+                                                                               FontSize="11"
+                                                                               FontWeight="Bold"
+                                                                               Foreground="#FFFFFF"
+                                                                               Margin="6,0,0,0"
+                                                                               VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </Border>
+
+                                                            <!-- Features Items -->
+                                                            <ItemsControl x:Name="PART_ElemFeatures" ItemsSource="{Binding Game.Features}">
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <WrapPanel Orientation="Horizontal" />
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Button Content="{Binding Name}"
+                                                                                Tag="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=IsFilterActiveConverter}, ConverterParameter=Feature}"
+                                                                                Style="{StaticResource PropertyItemFeatureButton}"
+                                                                                Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Feature}"
+                                                                                CommandParameter="{Binding}" />
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </WrapPanel>
+
+                                                        <!-- Categories Group -->
+                                                        <WrapPanel Orientation="Horizontal" Margin="0,0,24,6">
+                                                            <WrapPanel.Style>
+                                                                <Style TargetType="WrapPanel">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Game.Categories, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=HasItemsToVisibilityConverter}}" Value="Visible">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Settings DetailsVisibility.Categories}" Value="False">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </WrapPanel.Style>
+
+                                                            <!-- Categories Header Badge -->
+                                                            <Border Background="#35D97706"
+                                                                    BorderBrush="#80FBBF24"
+                                                                    BorderThickness="1.5"
+                                                                    CornerRadius="6"
+                                                                    Padding="8,5,10,5"
+                                                                    Margin="0,2,8,6"
+                                                                    VerticalAlignment="Center"
+                                                                    ToolTip="{DynamicResource LOCGameCategoriesTitle}">
+                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                    <TextBlock Text="&#xE8B9;"
+                                                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                                               FontSize="11"
+                                                                               Foreground="#FDE68A"
+                                                                               VerticalAlignment="Center"/>
+                                                                    <TextBlock Text="{DynamicResource LOCGameCategoriesTitle}"
+                                                                               FontSize="11"
+                                                                               FontWeight="Bold"
+                                                                               Foreground="#FFFFFF"
+                                                                               Margin="6,0,0,0"
+                                                                               VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </Border>
+
+                                                            <!-- Categories Items -->
+                                                            <ItemsControl x:Name="PART_ElemCategories" ItemsSource="{Binding Game.Categories}">
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <WrapPanel Orientation="Horizontal" />
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Button Content="{Binding Name}"
+                                                                                Tag="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=IsFilterActiveConverter}, ConverterParameter=Category}"
+                                                                                Style="{StaticResource PropertyItemCategoryButton}"
+                                                                                Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Category}"
+                                                                                CommandParameter="{Binding}" />
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </WrapPanel>
+
+                                                        <!-- Tags Group -->
+                                                        <WrapPanel Orientation="Horizontal" Margin="0,0,24,6">
+                                                            <WrapPanel.Style>
+                                                                <Style TargetType="WrapPanel">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Game.Tags, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=HasItemsToVisibilityConverter}}" Value="Visible">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Settings DetailsVisibility.Tags}" Value="False">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </WrapPanel.Style>
+
+                                                            <!-- Tags Header Badge -->
+                                                            <Border Background="#25FFFFFF"
+                                                                    BorderBrush="#60FFFFFF"
+                                                                    BorderThickness="1.5"
+                                                                    CornerRadius="6"
+                                                                    Padding="8,5,10,5"
+                                                                    Margin="0,2,8,6"
+                                                                    VerticalAlignment="Center"
+                                                                    ToolTip="{DynamicResource LOCMythos_Tags}">
+                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                    <TextBlock Text="&#xE8EC;"
+                                                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                                               FontSize="11"
+                                                                               Foreground="#CBD5E1"
+                                                                               VerticalAlignment="Center"/>
+                                                                    <TextBlock Text="{DynamicResource LOCMythos_Tags}"
+                                                                               FontSize="11"
+                                                                               FontWeight="Bold"
+                                                                               Foreground="#FFFFFF"
+                                                                               Margin="6,0,0,0"
+                                                                               VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </Border>
+
+                                                            <!-- Tags Items -->
+                                                            <ItemsControl x:Name="PART_ElemTags" ItemsSource="{Binding Game.Tags}">
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <WrapPanel Orientation="Horizontal" />
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Button Content="{Binding Name}"
+                                                                                Tag="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=IsFilterActiveConverter}, ConverterParameter=Tag}"
+                                                                                Style="{StaticResource PropertyItemTagButton}"
+                                                                                Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Tag}"
+                                                                                CommandParameter="{Binding}" />
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </WrapPanel>
+                                                    </WrapPanel>
+                                                </DockPanel>
+                                            </Border>
+                                        </Grid>
+                                    </StackPanel>
                                 </Grid>
                             </Grid>
                         </ScrollViewer>
