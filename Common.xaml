@@ -177,17 +177,39 @@
         </Setter>
     </Style>
 
-    <Style x:Key="DetailsClearFilterButton" TargetType="{x:Type Button}" BasedOn="{StaticResource DetailsSemiTransparentButton}">
+    <Style x:Key="DetailsClearFilterButton" TargetType="{x:Type Button}" BasedOn="{StaticResource BaseStyle}">
+        <Setter Property="Background" Value="{DynamicResource SecondaryButtonIdleBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ControlIdleBorderBrush}"/>
         <Setter Property="Width" Value="34"/>
         <Setter Property="Height" Value="34"/>
         <Setter Property="ToolTip" Value="{DynamicResource LOCClearFilters}"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Command" Value="{Binding DataContext.ClearFiltersCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-        <Setter Property="Content">
+        <Setter Property="Template">
             <Setter.Value>
-                <TextBlock Text="&#xED62;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                           FontSize="14" Foreground="{DynamicResource TextBrush}"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Border" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{DynamicResource ControlCornerRadius}">
+                        <TextBlock Text="&#xED62;"
+                                   FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   FontSize="14"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource SecondaryButtonHoverBackgroundBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.4"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
             </Setter.Value>
         </Setter>
         <Style.Triggers>

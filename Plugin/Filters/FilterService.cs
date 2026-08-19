@@ -82,6 +82,29 @@ namespace MythosHelper.Filters
             return null;
         }
 
+        public static object GetFilterSettings()
+        {
+            var mm = GetMainModel();
+            if (mm == null) return null;
+
+            try
+            {
+                var appSettingsProp = mm.GetType().GetProperty("AppSettings");
+                var appSettings = appSettingsProp?.GetValue(mm);
+                if (appSettings != null)
+                {
+                    var filterSettingsProp = appSettings.GetType().GetProperty("FilterSettings");
+                    return filterSettingsProp?.GetValue(appSettings);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error getting FilterSettings");
+            }
+
+            return null;
+        }
+
         private static void HookDatabaseFilters(object dbFilters)
         {
             if (_isHooked || dbFilters == null) return;
@@ -100,6 +123,19 @@ namespace MythosHelper.Filters
                 if (dbFilters is INotifyPropertyChanged inpcFilter)
                 {
                     inpcFilter.PropertyChanged += (s, e) => notify();
+                }
+
+                var fs = GetFilterSettings();
+                if (fs is INotifyPropertyChanged inpcSettings)
+                {
+                    inpcSettings.PropertyChanged += (s, e) =>
+                    {
+                        notify();
+                        if (e?.PropertyName == "IsInstalled" || e?.PropertyName == "Favorite")
+                        {
+                            SelectFirstFilteredGame();
+                        }
+                    };
                 }
 
                 var props = dbFilters.GetType().GetProperties();
@@ -356,7 +392,6 @@ namespace MythosHelper.Filters
 
                 MythosHelperPlugin.Instance?.Settings?.IncrementFilterVersion();
                 RefreshAllChipButtons();
-                SelectFirstFilteredGame();
             }
             catch (Exception ex)
             {
