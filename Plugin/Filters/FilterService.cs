@@ -249,11 +249,40 @@ namespace MythosHelper.Filters
 
                 MythosHelperPlugin.Instance?.Settings?.IncrementFilterVersion();
                 RefreshAllChipButtons();
+                SelectFirstFilteredGame();
                 Logger.Info("[MythosHelper] Cleared metadata filters while preserving installed, hidden, and match all filters settings.");
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, "Error clearing metadata filters");
+            }
+        }
+
+        public static void SelectFirstFilteredGame()
+        {
+            try
+            {
+                Application.Current?.Dispatcher?.BeginInvoke(new Action(() =>
+                {
+                    try
+                    {
+                        var api = MythosHelperPlugin.Instance?.PlayniteApi;
+                        var firstGame = api?.MainView?.FilteredGames?.FirstOrDefault();
+                        if (firstGame != null)
+                        {
+                            api.MainView.SelectGame(firstGame.Id);
+                            Logger.Info($"[MythosHelper] Auto-selected first filtered game: {firstGame.Name} ({firstGame.Id})");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, "Error selecting first filtered game");
+                    }
+                }), System.Windows.Threading.DispatcherPriority.Background);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error dispatching SelectFirstFilteredGame");
             }
         }
 
@@ -327,6 +356,7 @@ namespace MythosHelper.Filters
 
                 MythosHelperPlugin.Instance?.Settings?.IncrementFilterVersion();
                 RefreshAllChipButtons();
+                SelectFirstFilteredGame();
             }
             catch (Exception ex)
             {

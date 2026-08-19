@@ -86,12 +86,14 @@
     <!-- Base Chip Indicator Template Generator -->
     <Style x:Key="PropertyItemSeriesButton" TargetType="Button">
         <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}"/>
-        <Setter Property="Margin" Value="0,2,8,6"/>
+        <Setter Property="Margin" Value="0,2,8,2"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Foreground" Value="#DDD6FE"/>
         <Setter Property="Background" Value="#1F8A5CF6"/>
         <Setter Property="BorderBrush" Value="#4C8A5CF6"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Command" Value="{Binding DataContext.SetSeriesFilterCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -133,16 +135,23 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{PluginStatus Plugin=MythosHelper_Loki, Status=Installed}" Value="True">
+                <Setter Property="Command" Value="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Series}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="PropertyItemGenreButton" TargetType="Button">
         <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}"/>
-        <Setter Property="Margin" Value="0,2,8,6"/>
+        <Setter Property="Margin" Value="0,2,8,2"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Foreground" Value="#BAE6FD"/>
         <Setter Property="Background" Value="#1F0284C7"/>
         <Setter Property="BorderBrush" Value="#4C38BDF8"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Command" Value="{Binding DataContext.SetGenreFilterCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -184,16 +193,23 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{PluginStatus Plugin=MythosHelper_Loki, Status=Installed}" Value="True">
+                <Setter Property="Command" Value="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Genre}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="PropertyItemFeatureButton" TargetType="Button">
         <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}"/>
-        <Setter Property="Margin" Value="0,2,8,6"/>
+        <Setter Property="Margin" Value="0,2,8,2"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Foreground" Value="#A7F3D0"/>
         <Setter Property="Background" Value="#1F059669"/>
         <Setter Property="BorderBrush" Value="#4C34D399"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Command" Value="{Binding DataContext.SetFeatureFilterCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -235,16 +251,23 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{PluginStatus Plugin=MythosHelper_Loki, Status=Installed}" Value="True">
+                <Setter Property="Command" Value="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Feature}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="PropertyItemCategoryButton" TargetType="Button">
         <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}"/>
-        <Setter Property="Margin" Value="0,2,8,6"/>
+        <Setter Property="Margin" Value="0,2,8,2"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Foreground" Value="#FDE68A"/>
         <Setter Property="Background" Value="#1FD97706"/>
         <Setter Property="BorderBrush" Value="#4CFBBF24"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Command" Value="{Binding DataContext.SetCategoryFilterCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -286,16 +309,23 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{PluginStatus Plugin=MythosHelper_Loki, Status=Installed}" Value="True">
+                <Setter Property="Command" Value="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Category}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="PropertyItemTagButton" TargetType="Button">
         <Setter Property="FontSize" Value="{DynamicResource FontSizeSmall}"/>
-        <Setter Property="Margin" Value="0,2,8,6"/>
+        <Setter Property="Margin" Value="0,2,8,2"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Foreground" Value="#E2E8F0"/>
         <Setter Property="Background" Value="#14FFFFFF"/>
         <Setter Property="BorderBrush" Value="#30FFFFFF"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Command" Value="{Binding DataContext.SetTagFilterCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -337,6 +367,11 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{PluginStatus Plugin=MythosHelper_Loki, Status=Installed}" Value="True">
+                <Setter Property="Command" Value="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Tag}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="FilterItemTagButton" TargetType="Button">

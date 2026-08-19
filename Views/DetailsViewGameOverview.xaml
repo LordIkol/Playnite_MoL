@@ -1826,33 +1826,35 @@
                                             <Border Background="{DynamicResource BackdropGlass1}"/>
                                             <Border BorderBrush="{DynamicResource ContentBorderBrushOverlay}" BorderThickness="0,1,0,1" Padding="40,6,40,6">
                                                 <DockPanel LastChildFill="True">
-                                                    <!-- Clear Filters Brush Button -->
-                                                    <Button ToolTip="{DynamicResource LOCClearFilters}"
-                                                            Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ClearMetadataFiltersCommandConverter}}"
-                                                            Style="{StaticResource DetailsSemiTransparentButton}"
-                                                            Height="30" Width="30" Margin="0,0,16,0"
-                                                            DockPanel.Dock="Left" VerticalAlignment="Center"
-                                                            Cursor="Hand">
-                                                        <TextBlock Text="&#xED62;"
-                                                                   FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                                                   FontSize="13"
-                                                                   Foreground="{DynamicResource TextBrush}"
-                                                                   VerticalAlignment="Center"
-                                                                   HorizontalAlignment="Center"/>
-                                                    </Button>
+                                                    <!-- QUICK FILTER ACTION BUTTONS (Clear & Match All) -->
+                                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center" Margin="0,0,20,0">
+                                                        <!-- Clear Filters Button (with plugin & native fallback support) -->
+                                                        <Button Style="{StaticResource DetailsClearFilterButton}"
+                                                                Height="34" Width="34" Margin="0,0,6,0"/>
 
-                                                    <!-- COLLAPSIBLE CHIPS WRAPPANEL -->
-                                                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <!-- Toggle Match All Filters Button -->
+                                                        <ToggleButton ToolTip="{DynamicResource LOCFilterMatchAll}"
+                                                                      IsChecked="{Settings FilterSettings.UseAndFilteringStyle, Mode=TwoWay}"
+                                                                      Style="{StaticResource DetailsSemiTransparentToggleButton}"
+                                                                      Height="34" Width="34" Margin="0,0,0,0"
+                                                                      Cursor="Hand">
+                                                            <TextBlock Text="&#xE8B1;"
+                                                                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                                                       FontSize="14"
+                                                                       Foreground="{DynamicResource TextBrush}"
+                                                                       VerticalAlignment="Center"
+                                                                       HorizontalAlignment="Center"/>
+                                                        </ToggleButton>
+                                                    </StackPanel>
+
+                                                    <!-- COLLAPSIBLE CHIPS WRAPPANEL (Horizontally and Vertically Centered) -->
+                                                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                         
                                                         <!-- Series Group -->
-                                                        <WrapPanel Orientation="Horizontal" Margin="0,0,24,6">
+                                                        <WrapPanel Orientation="Horizontal" Margin="0,2,24,2" VerticalAlignment="Center" Visibility="{Binding ElementName=PART_ElemSeries, Path=Visibility}">
                                                             <WrapPanel.Style>
                                                                 <Style TargetType="WrapPanel">
-                                                                    <Setter Property="Visibility" Value="Collapsed" />
                                                                     <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Game.Series, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=HasItemsToVisibilityConverter}}" Value="Visible">
-                                                                            <Setter Property="Visibility" Value="Visible" />
-                                                                        </DataTrigger>
                                                                         <DataTrigger Binding="{Settings DetailsVisibility.Series}" Value="False">
                                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                                         </DataTrigger>
@@ -1860,13 +1862,13 @@
                                                                 </Style>
                                                             </WrapPanel.Style>
                                                             
-                                                            <!-- Series Header Badge -->
+                                                             <!-- Series Header Badge -->
                                                             <Border Background="#358A5CF6"
                                                                     BorderBrush="#80A855F7"
                                                                     BorderThickness="1.5"
                                                                     CornerRadius="6"
                                                                     Padding="8,5,10,5"
-                                                                    Margin="0,2,8,6"
+                                                                    Margin="0,2,8,2"
                                                                     VerticalAlignment="Center"
                                                                     ToolTip="{DynamicResource LOCSeriesLabel}">
                                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -1885,10 +1887,10 @@
                                                             </Border>
 
                                                             <!-- Series Items -->
-                                                            <ItemsControl x:Name="PART_ElemSeries" ItemsSource="{Binding Game.Series}">
+                                                            <ItemsControl x:Name="PART_ElemSeries" ItemsSource="{Binding Game.Series}" VerticalAlignment="Center">
                                                                 <ItemsControl.ItemsPanel>
                                                                     <ItemsPanelTemplate>
-                                                                        <WrapPanel Orientation="Horizontal" />
+                                                                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center"/>
                                                                     </ItemsPanelTemplate>
                                                                 </ItemsControl.ItemsPanel>
                                                                 <ItemsControl.ItemTemplate>
@@ -1896,7 +1898,6 @@
                                                                         <Button Content="{Binding Name}"
                                                                                 Tag="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=IsFilterActiveConverter}, ConverterParameter=Series}"
                                                                                 Style="{StaticResource PropertyItemSeriesButton}"
-                                                                                Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Series}"
                                                                                 CommandParameter="{Binding}" />
                                                                     </DataTemplate>
                                                                 </ItemsControl.ItemTemplate>
@@ -1904,14 +1905,10 @@
                                                         </WrapPanel>
 
                                                         <!-- Genres Group -->
-                                                        <WrapPanel Orientation="Horizontal" Margin="0,0,24,6">
+                                                        <WrapPanel Orientation="Horizontal" Margin="0,2,24,2" VerticalAlignment="Center" Visibility="{Binding ElementName=PART_ElemGenres, Path=Visibility}">
                                                             <WrapPanel.Style>
                                                                 <Style TargetType="WrapPanel">
-                                                                    <Setter Property="Visibility" Value="Collapsed" />
                                                                     <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Game.Genres, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=HasItemsToVisibilityConverter}}" Value="Visible">
-                                                                            <Setter Property="Visibility" Value="Visible" />
-                                                                        </DataTrigger>
                                                                         <DataTrigger Binding="{Settings DetailsVisibility.Genres}" Value="False">
                                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                                         </DataTrigger>
@@ -1925,7 +1922,7 @@
                                                                     BorderThickness="1.5"
                                                                     CornerRadius="6"
                                                                     Padding="8,5,10,5"
-                                                                    Margin="0,2,8,6"
+                                                                    Margin="0,2,8,2"
                                                                     VerticalAlignment="Center"
                                                                     ToolTip="{DynamicResource LOCGenresLabel}">
                                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -1944,10 +1941,10 @@
                                                             </Border>
 
                                                             <!-- Genres Items -->
-                                                            <ItemsControl x:Name="PART_ElemGenres" ItemsSource="{Binding Game.Genres}">
+                                                            <ItemsControl x:Name="PART_ElemGenres" ItemsSource="{Binding Game.Genres}" VerticalAlignment="Center">
                                                                 <ItemsControl.ItemsPanel>
                                                                     <ItemsPanelTemplate>
-                                                                        <WrapPanel Orientation="Horizontal" />
+                                                                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center"/>
                                                                     </ItemsPanelTemplate>
                                                                 </ItemsControl.ItemsPanel>
                                                                 <ItemsControl.ItemTemplate>
@@ -1955,7 +1952,6 @@
                                                                         <Button Content="{Binding Name}"
                                                                                 Tag="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=IsFilterActiveConverter}, ConverterParameter=Genre}"
                                                                                 Style="{StaticResource PropertyItemGenreButton}"
-                                                                                Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Genre}"
                                                                                 CommandParameter="{Binding}" />
                                                                     </DataTemplate>
                                                                 </ItemsControl.ItemTemplate>
@@ -1963,14 +1959,10 @@
                                                         </WrapPanel>
 
                                                         <!-- Features Group -->
-                                                        <WrapPanel Orientation="Horizontal" Margin="0,0,24,6">
+                                                        <WrapPanel Orientation="Horizontal" Margin="0,2,24,2" VerticalAlignment="Center" Visibility="{Binding ElementName=PART_ElemFeatures, Path=Visibility}">
                                                             <WrapPanel.Style>
                                                                 <Style TargetType="WrapPanel">
-                                                                    <Setter Property="Visibility" Value="Collapsed" />
                                                                     <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Game.Features, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=HasItemsToVisibilityConverter}}" Value="Visible">
-                                                                            <Setter Property="Visibility" Value="Visible" />
-                                                                        </DataTrigger>
                                                                         <DataTrigger Binding="{Settings DetailsVisibility.Features}" Value="False">
                                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                                         </DataTrigger>
@@ -1984,7 +1976,7 @@
                                                                     BorderThickness="1.5"
                                                                     CornerRadius="6"
                                                                     Padding="8,5,10,5"
-                                                                    Margin="0,2,8,6"
+                                                                    Margin="0,2,8,2"
                                                                     VerticalAlignment="Center"
                                                                     ToolTip="{DynamicResource LOCFeaturesLabel}">
                                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -2003,10 +1995,10 @@
                                                             </Border>
 
                                                             <!-- Features Items -->
-                                                            <ItemsControl x:Name="PART_ElemFeatures" ItemsSource="{Binding Game.Features}">
+                                                            <ItemsControl x:Name="PART_ElemFeatures" ItemsSource="{Binding Game.Features}" VerticalAlignment="Center">
                                                                 <ItemsControl.ItemsPanel>
                                                                     <ItemsPanelTemplate>
-                                                                        <WrapPanel Orientation="Horizontal" />
+                                                                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center"/>
                                                                     </ItemsPanelTemplate>
                                                                 </ItemsControl.ItemsPanel>
                                                                 <ItemsControl.ItemTemplate>
@@ -2014,7 +2006,6 @@
                                                                         <Button Content="{Binding Name}"
                                                                                 Tag="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=IsFilterActiveConverter}, ConverterParameter=Feature}"
                                                                                 Style="{StaticResource PropertyItemFeatureButton}"
-                                                                                Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Feature}"
                                                                                 CommandParameter="{Binding}" />
                                                                     </DataTemplate>
                                                                 </ItemsControl.ItemTemplate>
@@ -2022,14 +2013,10 @@
                                                         </WrapPanel>
 
                                                         <!-- Categories Group -->
-                                                        <WrapPanel Orientation="Horizontal" Margin="0,0,24,6">
+                                                        <WrapPanel Orientation="Horizontal" Margin="0,2,24,2" VerticalAlignment="Center" Visibility="{Binding ElementName=PART_ElemCategories, Path=Visibility}">
                                                             <WrapPanel.Style>
                                                                 <Style TargetType="WrapPanel">
-                                                                    <Setter Property="Visibility" Value="Collapsed" />
                                                                     <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Game.Categories, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=HasItemsToVisibilityConverter}}" Value="Visible">
-                                                                            <Setter Property="Visibility" Value="Visible" />
-                                                                        </DataTrigger>
                                                                         <DataTrigger Binding="{Settings DetailsVisibility.Categories}" Value="False">
                                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                                         </DataTrigger>
@@ -2043,7 +2030,7 @@
                                                                     BorderThickness="1.5"
                                                                     CornerRadius="6"
                                                                     Padding="8,5,10,5"
-                                                                    Margin="0,2,8,6"
+                                                                    Margin="0,2,8,2"
                                                                     VerticalAlignment="Center"
                                                                     ToolTip="{DynamicResource LOCGameCategoriesTitle}">
                                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -2062,10 +2049,10 @@
                                                             </Border>
 
                                                             <!-- Categories Items -->
-                                                            <ItemsControl x:Name="PART_ElemCategories" ItemsSource="{Binding Game.Categories}">
+                                                            <ItemsControl x:Name="PART_ElemCategories" ItemsSource="{Binding Game.Categories}" VerticalAlignment="Center">
                                                                 <ItemsControl.ItemsPanel>
                                                                     <ItemsPanelTemplate>
-                                                                        <WrapPanel Orientation="Horizontal" />
+                                                                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center"/>
                                                                     </ItemsPanelTemplate>
                                                                 </ItemsControl.ItemsPanel>
                                                                 <ItemsControl.ItemTemplate>
@@ -2073,7 +2060,6 @@
                                                                         <Button Content="{Binding Name}"
                                                                                 Tag="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=IsFilterActiveConverter}, ConverterParameter=Category}"
                                                                                 Style="{StaticResource PropertyItemCategoryButton}"
-                                                                                Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Category}"
                                                                                 CommandParameter="{Binding}" />
                                                                     </DataTemplate>
                                                                 </ItemsControl.ItemTemplate>
@@ -2081,14 +2067,10 @@
                                                         </WrapPanel>
 
                                                         <!-- Tags Group -->
-                                                        <WrapPanel Orientation="Horizontal" Margin="0,0,24,6">
+                                                        <WrapPanel Orientation="Horizontal" Margin="0,2,24,2" VerticalAlignment="Center" Visibility="{Binding ElementName=PART_ElemTags, Path=Visibility}">
                                                             <WrapPanel.Style>
                                                                 <Style TargetType="WrapPanel">
-                                                                    <Setter Property="Visibility" Value="Collapsed" />
                                                                     <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Game.Tags, Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=HasItemsToVisibilityConverter}}" Value="Visible">
-                                                                            <Setter Property="Visibility" Value="Visible" />
-                                                                        </DataTrigger>
                                                                         <DataTrigger Binding="{Settings DetailsVisibility.Tags}" Value="False">
                                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                                         </DataTrigger>
@@ -2102,7 +2084,7 @@
                                                                     BorderThickness="1.5"
                                                                     CornerRadius="6"
                                                                     Padding="8,5,10,5"
-                                                                    Margin="0,2,8,6"
+                                                                    Margin="0,2,8,2"
                                                                     VerticalAlignment="Center"
                                                                     ToolTip="{DynamicResource LOCMythos_Tags}">
                                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -2121,10 +2103,10 @@
                                                             </Border>
 
                                                             <!-- Tags Items -->
-                                                            <ItemsControl x:Name="PART_ElemTags" ItemsSource="{Binding Game.Tags}">
+                                                            <ItemsControl x:Name="PART_ElemTags" ItemsSource="{Binding Game.Tags}" VerticalAlignment="Center">
                                                                 <ItemsControl.ItemsPanel>
                                                                     <ItemsPanelTemplate>
-                                                                        <WrapPanel Orientation="Horizontal" />
+                                                                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center"/>
                                                                     </ItemsPanelTemplate>
                                                                 </ItemsControl.ItemsPanel>
                                                                 <ItemsControl.ItemTemplate>
@@ -2132,7 +2114,6 @@
                                                                         <Button Content="{Binding Name}"
                                                                                 Tag="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=IsFilterActiveConverter}, ConverterParameter=Tag}"
                                                                                 Style="{StaticResource PropertyItemTagButton}"
-                                                                                Command="{Binding Converter={PluginConverter Plugin=MythosHelper_Loki, Converter=ToggleFilterCommandConverter}, ConverterParameter=Tag}"
                                                                                 CommandParameter="{Binding}" />
                                                                     </DataTemplate>
                                                                 </ItemsControl.ItemTemplate>

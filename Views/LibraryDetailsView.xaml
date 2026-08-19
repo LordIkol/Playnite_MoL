@@ -11,58 +11,110 @@
                     <DockPanel d:DesignWidth="1280" d:DesignHeight="960"
                                d:DataContext="{x:Static DesignMainViewModel.DesignIntance}">
 
-                        <Grid DockPanel.Dock="Left" Background="Transparent"
-                              Width="{Settings DetailsListWitdh}">
-                            <Grid.OpacityMask>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Offset="0" Color="#FF000000"/>  
-                                <GradientStop Offset="0.9" Color="#FF000000"/>  
-                                <GradientStop Offset="1" Color="#00000000"/>
-                            </LinearGradientBrush>
-                            </Grid.OpacityMask>
+                        <DockPanel DockPanel.Dock="Left" Background="Transparent"
+                               Width="{Settings DetailsListWitdh}">
 
-                            <ExtendedListBox x:Name="PART_ListGames"
-                                            BorderBrush="{DynamicResource PanelSeparatorBrush}"
-                                            ItemContainerStyle="{DynamicResource DetailsViewItemStyle}"
-                                            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                            ScrollViewer.PanningMode="VerticalOnly">
-                                <ExtendedListBox.Style>
-                                    <Style TargetType="ExtendedListBox" BasedOn="{StaticResource {x:Type ExtendedListBox}}">
-                                        <Setter Property="Margin" Value="0"/>
-                                        <Setter Property="Padding" Value="0,0,2,0"/>
-                                        <Setter Property="BorderThickness" Value="0"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Settings ShowSidebar}" Value="False">
-                                                <Setter Property="Margin" Value="16,0,0,0"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ExtendedListBox.Style>
-                                <ExtendedListBox.GroupStyle>
-                                    <GroupStyle ContainerStyle="{StaticResource DetailsViewGroupStyle}"/>
-                                </ExtendedListBox.GroupStyle>
-                                <ExtendedListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <GameListItem Style="{StaticResource DetailsViewItemTemplate}"/>
-                                    </DataTemplate>
-                                </ExtendedListBox.ItemTemplate>
-                            </ExtendedListBox>
-                            
-                            <TextBlock FontSize="{StaticResource FontSizeLarge}" Margin="0,0,0,0"
-                                       Text="{DynamicResource LOCNoItemsFound}" TextWrapping="Wrap"                                       
-                                       TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Items.Count, ElementName=PART_ListGames, Mode=OneWay}" Value="0">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Grid>
+                            <!-- Quick Filter Bar below Search Bar and before Games List -->
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,8">
+                                <!-- Clear Filters Button (with plugin & native fallback support) -->
+                                <Button Style="{StaticResource DetailsClearFilterButton}"
+                                        Height="34" Width="34" Margin="0,0,6,0"/>
+
+                                <!-- Toggle Installed Filter Button -->
+                                <ToggleButton ToolTip="{DynamicResource LOCGameIsInstalledTitle}"
+                                              IsChecked="{Settings FilterSettings.IsInstalled, Mode=TwoWay}"
+                                              Style="{StaticResource DetailsSemiTransparentToggleButton}"
+                                              Height="34" Width="34" Margin="0,0,6,0"
+                                              Cursor="Hand">
+                                    <TextBlock Text="&#xE896;"
+                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                               FontSize="14"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </ToggleButton>
+
+                                <!-- Toggle Favorite Filter Button -->
+                                <ToggleButton ToolTip="{DynamicResource LOCGameFavoriteTitle}"
+                                              IsChecked="{Settings FilterSettings.Favorite, Mode=TwoWay}"
+                                              Style="{StaticResource DetailsSemiTransparentToggleButton}"
+                                              Height="34" Width="34" Margin="0,0,6,0"
+                                              Cursor="Hand">
+                                    <TextBlock Text="&#xEB52;"
+                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                               FontSize="14"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </ToggleButton>
+
+                                <!-- Toggle Match All Filters Button -->
+                                <ToggleButton ToolTip="{DynamicResource LOCFilterMatchAll}"
+                                              IsChecked="{Settings FilterSettings.UseAndFilteringStyle, Mode=TwoWay}"
+                                              Style="{StaticResource DetailsSemiTransparentToggleButton}"
+                                              Height="34" Width="34" Margin="0,0,0,0"
+                                              Cursor="Hand">
+                                    <TextBlock Text="&#xE8B1;"
+                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                               FontSize="14"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </ToggleButton>
+                            </StackPanel>
+
+                            <Grid>
+                                <Grid.OpacityMask>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Offset="0" Color="#FF000000"/>  
+                                    <GradientStop Offset="0.9" Color="#FF000000"/>  
+                                    <GradientStop Offset="1" Color="#00000000"/>
+                                </LinearGradientBrush>
+                                </Grid.OpacityMask>
+
+                                <ExtendedListBox x:Name="PART_ListGames"
+                                                BorderBrush="{DynamicResource PanelSeparatorBrush}"
+                                                ItemContainerStyle="{DynamicResource DetailsViewItemStyle}"
+                                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                ScrollViewer.PanningMode="VerticalOnly">
+                                    <ExtendedListBox.Style>
+                                        <Style TargetType="ExtendedListBox" BasedOn="{StaticResource {x:Type ExtendedListBox}}">
+                                            <Setter Property="Margin" Value="0"/>
+                                            <Setter Property="Padding" Value="0,0,2,0"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Settings ShowSidebar}" Value="False">
+                                                    <Setter Property="Margin" Value="16,0,0,0"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ExtendedListBox.Style>
+                                    <ExtendedListBox.GroupStyle>
+                                        <GroupStyle ContainerStyle="{StaticResource DetailsViewGroupStyle}"/>
+                                    </ExtendedListBox.GroupStyle>
+                                    <ExtendedListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <GameListItem Style="{StaticResource DetailsViewItemTemplate}"/>
+                                        </DataTemplate>
+                                    </ExtendedListBox.ItemTemplate>
+                                </ExtendedListBox>
+                                
+                                <TextBlock FontSize="{StaticResource FontSizeLarge}" Margin="0,0,0,0"
+                                           Text="{DynamicResource LOCNoItemsFound}" TextWrapping="Wrap"                                       
+                                           TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Items.Count, ElementName=PART_ListGames, Mode=OneWay}" Value="0">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </DockPanel>
                         <DetailsViewGameOverview x:Name="PART_ControlGameView" DockPanel.Dock="Left" />
 
                     </DockPanel>
