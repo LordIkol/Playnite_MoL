@@ -219,8 +219,45 @@ namespace MythosHelper.Filters
             return prop?.GetValue(dbFilters);
         }
 
+        public static PropertyInfo GetFilterSettingsProperty(object filterSettings, string categoryName)
+        {
+            if (filterSettings == null || string.IsNullOrEmpty(categoryName)) return null;
+            var type = filterSettings.GetType();
+
+            string singular = categoryName;
+            if (singular.EndsWith("ies", StringComparison.OrdinalIgnoreCase))
+                singular = singular.Substring(0, singular.Length - 3) + "y";
+            else if (singular.EndsWith("s", StringComparison.OrdinalIgnoreCase) && !singular.Equals("Series", StringComparison.OrdinalIgnoreCase))
+                singular = singular.Substring(0, singular.Length - 1);
+
+            return type.GetProperty(singular, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase) ??
+                   type.GetProperty(categoryName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+        }
+
         public static List<Guid> GetFilterIds(string propertyName)
         {
+            try
+            {
+                var fs = GetFilterSettings();
+                var fsProp = GetFilterSettingsProperty(fs, propertyName);
+                if (fsProp != null && fs != null)
+                {
+                    var fsVal = fsProp.GetValue(fs);
+                    if (fsVal != null)
+                    {
+                        var idsProp = fsVal.GetType().GetProperty("Ids");
+                        if (idsProp?.GetValue(fsVal) is IEnumerable<Guid> gList)
+                        {
+                            return gList.ToList();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error reading IDs from FilterSettings");
+            }
+
             var list = GetSelectableList(propertyName);
             if (list == null) return null;
 
@@ -253,9 +290,6 @@ namespace MythosHelper.Filters
 
         public static void ClearMetadataFilters()
         {
-            var dbFilters = GetDatabaseFilters();
-            if (dbFilters == null) return;
-
             try
             {
                 string[] categoriesToClear = new[]
@@ -273,6 +307,8 @@ namespace MythosHelper.Filters
                     "AgeRatings"
                 };
 
+                var fs = GetFilterSettings();
+
                 foreach (var cat in categoriesToClear)
                 {
                     var list = GetSelectableList(cat);
@@ -280,6 +316,12 @@ namespace MythosHelper.Filters
                     {
                         var setSelectionMethod = list.GetType().GetMethod("SetSelection", new[] { typeof(IEnumerable<Guid>) });
                         setSelectionMethod?.Invoke(list, new object[] { null });
+                    }
+
+                    if (fs != null)
+                    {
+                        var fsProp = GetFilterSettingsProperty(fs, cat);
+                        fsProp?.SetValue(fs, null);
                     }
                 }
 
@@ -362,33 +404,52 @@ namespace MythosHelper.Filters
                 return;
             }
 
-            var list = GetSelectableList(propertyName);
-            if (list == null)
-            {
-                Logger.Warn($"[MythosHelper] ToggleFilter: SelectableDbItemList not found for {propertyName}");
-                return;
-            }
-
             try
             {
-                var getSelectedMethod = list.GetType().GetMethod("GetSelectedIds");
-                var setSelectionMethod = list.GetType().GetMethod("SetSelection", new[] { typeof(IEnumerable<Guid>) });
+                var currentIds = GetFilterIds(propertyName) ?? new List<Guid>();
 
-                var currentIds = getSelectedMethod?.Invoke(list, null) as IEnumerable<Guid>;
-                var newIdsList = currentIds != null ? new List<Guid>(currentIds) : new List<Guid>();
-
-                if (newIdsList.Contains(id))
+                if (currentIds.Contains(id))
                 {
-                    newIdsList.Remove(id);
+                    currentIds.Remove(id);
                     Logger.Info($"[MythosHelper] Removed {id} from {propertyName}");
                 }
                 else
                 {
-                    newIdsList.Add(id);
+                    currentIds.Add(id);
                     Logger.Info($"[MythosHelper] Added {id} to {propertyName}");
                 }
 
-                setSelectionMethod?.Invoke(list, new object[] { newIdsList.Count > 0 ? (IEnumerable<Guid>)newIdsList : null });
+                // 1. Update DatabaseFilters (UI SelectableDbItemList in sidebar filter panel)
+                var list = GetSelectableList(propertyName);
+                if (list != null)
+                {
+                    var setSelectionMethod = list.GetType().GetMethod("SetSelection", new[] { typeof(IEnumerable<Guid>) });
+                    setSelectionMethod?.Invoke(list, new object[] { currentIds.Count > 0 ? (IEnumerable<Guid>)currentIds : null });
+                }
+
+                // 2. Update FilterSettings (Core filtering engine)
+                var fs = GetFilterSettings();
+                var fsProp = GetFilterSettingsProperty(fs, propertyName);
+                if (fsProp != null && fs != null)
+                {
+                    object newPropVal = null;
+                    if (currentIds.Count > 0)
+                    {
+                        var propType = fsProp.PropertyType;
+                        var ctor = propType.GetConstructor(new[] { typeof(List<Guid>) });
+                        if (ctor != null)
+                        {
+                            newPropVal = ctor.Invoke(new object[] { currentIds });
+                        }
+                        else
+                        {
+                            newPropVal = Activator.CreateInstance(propType);
+                            var idsSetter = propType.GetProperty("Ids");
+                            idsSetter?.SetValue(newPropVal, currentIds);
+                        }
+                    }
+                    fsProp.SetValue(fs, newPropVal);
+                }
 
                 MythosHelperPlugin.Instance?.Settings?.IncrementFilterVersion();
                 RefreshAllChipButtons();
